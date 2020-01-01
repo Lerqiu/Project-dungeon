@@ -1,0 +1,66 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "map_loader.h"
+#include "window_creator.h"
+#include <gtk/gtk.h>
+
+int X = 0, Y = 0;
+GtkWidget *window;
+GtkWidget *lay;
+GtkWidget *image;
+GtkAdjustment *hadj;
+GtkAdjustment *vadj;
+void set_next()
+{
+    //gtk_layout_move(GTK_LAYOUT(lay), image, X, Y);
+    gtk_adjustment_set_value(hadj, X);
+    gtk_adjustment_set_value(vadj, Y);
+    X += 64 / 2;
+    Y += 64 / 2;
+    gint width,height;
+    gtk_window_get_size(GTK_WINDOW(window),&width,&height);
+    g_print("W:%i H:%i\n",width,height);
+}
+
+int main(void)
+{
+    /*Prototype_map *pr_map = prototype_load_map("Maps/Dungeon1.txt");
+
+    int b = 0;
+    for (int i = 0; i < pr_map->Y; i++)
+    {
+        for (int q = 0; q < pr_map->X; q++)
+        {
+            printf("%s %i %i\t\t", (pr_map->map + i * pr_map->X + q)->type_of_object, (pr_map->map + i * pr_map->X + q)->v1, (pr_map->map + i * pr_map->X + q)->v2);
+        }
+        putchar('\n');
+    }*/
+
+    window = window_creator_create_window();
+
+    hadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+    vadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+
+    lay = gtk_layout_new(hadj, vadj);
+    gtk_layout_set_size(GTK_LAYOUT(lay), 64 * 11, 64 * 11);
+    gtk_container_add(GTK_CONTAINER(window), lay);
+
+    image = gtk_image_new_from_file("./Images/path.png");
+    gtk_layout_put(GTK_LAYOUT(lay), image, 0, 0);
+    set_next();
+
+    GtkWidget *button = gtk_button_new();
+    gtk_button_set_label(GTK_BUTTON(button), "Next");
+    g_signal_connect(button, "clicked", set_next, NULL);
+    gtk_layout_put(GTK_LAYOUT(lay), button, 64, 64);
+
+    gtk_widget_show_all(window);
+    gtk_window_set_default_size(GTK_WINDOW(window),64*11,64*7);
+    gtk_window_set_resizable(GTK_WINDOW(window),FALSE);
+    gtk_window_set_position(GTK_WINDOW(window),GTK_WIN_POS_CENTER);
+    gtk_main();
+
+    return 1;
+}
