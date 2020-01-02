@@ -7,11 +7,12 @@
 #include "battleground.h"
 #include "settings.h"
 
-
-extern int DEF_IMAGE_SIZE ;
-extern char folderPathImages[];     //koniecznie zakończona ukośnikiem
+extern int DEF_IMAGE_SIZE;
+extern char folderPathImages[]; //koniecznie zakończona ukośnikiem
 extern char folderPathDynamic[];
 extern int maxLengthOfPath;
+extern int defaultMonsterSpeed;
+extern int defaultCharacterSpeed;
 
 static void print_prototype_map(Prototype_map *pr_map)
 {
@@ -113,7 +114,7 @@ void map_create_wall(int x, int y, BattlegroundStatic_element *element)
     element->type = (char *)malloc(sizeof(char) * (strlen("wall") + 1));
     strcpy(element->type, "wall");
     element->height = DEF_IMAGE_SIZE;
-    element->with = DEF_IMAGE_SIZE;
+    element->width = DEF_IMAGE_SIZE;
     element->posX = x * DEF_IMAGE_SIZE;
     element->posY = y * DEF_IMAGE_SIZE;
     element->colisionCheckX = DEF_IMAGE_SIZE / 2;
@@ -131,7 +132,7 @@ void map_create_nothing(int x, int y, BattlegroundStatic_element *element)
     element->height = DEF_IMAGE_SIZE;
     element->topimage = NULL;
     element->downimage = NULL;
-    element->with = DEF_IMAGE_SIZE;
+    element->width = DEF_IMAGE_SIZE;
     element->posX = x * DEF_IMAGE_SIZE;
     element->posY = y * DEF_IMAGE_SIZE;
     element->colisionCheckX = DEF_IMAGE_SIZE / 2;
@@ -194,7 +195,7 @@ static void set_wall(BattlegroundStatic_element *element, char nameImageDown[], 
     }
 
     element->height = height;
-    element->with = width;
+    element->width = width;
     element->type = (char *)malloc(sizeof(char) * (strlen("path") + 1));
     strcpy(element->type, "path");
 
@@ -394,7 +395,7 @@ void map_create_std_dynamic(int x, int y, BattlegroundDynamic_element *element, 
     else
         element->image = NULL;
     element->height = DEF_IMAGE_SIZE;
-    element->with = DEF_IMAGE_SIZE;
+    element->width = DEF_IMAGE_SIZE;
     element->posX = x * DEF_IMAGE_SIZE;
     element->posY = y * DEF_IMAGE_SIZE;
     element->colisionCheckX = DEF_IMAGE_SIZE / 2;
@@ -406,18 +407,14 @@ void map_create_std_dynamic(int x, int y, BattlegroundDynamic_element *element, 
     element->indexStartPointX = x;
     element->indexStartPointY = y;
 
+    element->layout = NULL;
+
     element->actionRange = 0;
     element->speed = 0;
 
     element->objectData = NULL;
     element->viewData = NULL;
 }
-
-void set_character_image(BattlegroundDynamic_element *element,char path[]){
-
-
-}
-
 
 BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *prototype_element, int x, int y) //x i y to numery indeksu
 {
@@ -430,6 +427,10 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
     else if (!strcmp(prototype_element->type_of_object, "ch"))
     {
         map_create_std_dynamic(x, y, element, "character");
+        element->speed = defaultCharacterSpeed;
+        element->colisionCheckY = DEF_IMAGE_SIZE / 4;
+        element->colisionCheckX = DEF_IMAGE_SIZE / 4;
+        element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
     }
     else if (!strcmp(prototype_element->type_of_object, "g"))
     {
@@ -442,6 +443,10 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
     else if (!strcmp(prototype_element->type_of_object, "m"))
     {
         map_create_std_dynamic(x, y, element, "monster");
+        element->speed = defaultMonsterSpeed;
+        element->colisionCheckY = DEF_IMAGE_SIZE / 4;
+        element->colisionCheckX = DEF_IMAGE_SIZE / 4;
+        element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
     }
     else if (!strcmp(prototype_element->type_of_object, "k"))
     {

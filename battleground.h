@@ -7,7 +7,7 @@ typedef struct battlegroundstatic_element
 {
     GtkWidget *downimage;
     GtkWidget *topimage;
-    int with,height;
+    int width,height;
     int posX,posY;
     int pivotPosX,pivotPosY;
     //wzgledem posX i posY
@@ -34,6 +34,12 @@ int direction;
 
 }monsterData;
 
+typedef struct character_data{
+
+GtkAdjustment *hadj;
+GtkAdjustment *vadj;
+
+}CharacterData;
 
 typedef struct battlegrounddynamic_element
 {
@@ -43,7 +49,9 @@ typedef struct battlegrounddynamic_element
     GtkWidget *image;
     void *viewData;//Implementacje animacjii póżniej
 
-    int with,height;
+    GtkWidget *layout;
+
+    int width,height;
     int posX,posY;
     int pivotPosX,pivotPosY;
     //wzgledem posX i posY

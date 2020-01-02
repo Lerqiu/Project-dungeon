@@ -17,11 +17,15 @@ extern char *characterNameHost;
 extern char *characterImagePathHost;
 extern int characterHostIndexX;
 extern int characterHostIndexY;
-
+extern int mapRows;
+extern int mapColumns;
 void set_characters_index(char pathToMap[])
 {
 
     Prototype_map *pr_map = prototype_load_map(pathToMap);
+    mapRows=pr_map->X;
+    mapColumns=pr_map->Y;
+
     int tabX[2];
     int tabY[2]; //Indexy postaci
 
@@ -47,18 +51,18 @@ void set_characters_index(char pathToMap[])
         printf(u8"Error: Niepoprawny plik z mapą, błędna ilość graczy!!!\n");
         exit(1);
     }
-    characterServerIndexX=tabX[0];
-    characterServerIndexY=tabY[0];
+    characterServerIndexX = tabX[0];
+    characterServerIndexY = tabY[0];
 
-    characterHostIndexX=tabX[1];
-    characterHostIndexY=tabY[1];
+    characterHostIndexX = tabX[1];
+    characterHostIndexY = tabY[1];
 }
 
 void set_connection(char pathToMap[])
 {
 
-    extern bool isAServer;
-    isAServer = true;
+    extern bool isServer;
+    isServer = true;
 
     extern char *mapPath;
     mapPath = (char *)malloc(sizeof(char) * (strlen(pathToMap) + 1));
