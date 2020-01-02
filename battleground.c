@@ -9,6 +9,7 @@
 
 BattlegroundStatic *static_objects_on_map;
 BattlegroundDynamic *dynamic_objects_on_map;
+
 extern int DEF_IMAGE_SIZE;
 extern bool reverseKeyBoard;
 
