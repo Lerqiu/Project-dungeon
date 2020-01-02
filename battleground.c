@@ -6,9 +6,10 @@
 #include "map_loader.h"
 
 BattlegroundStatic *static_objects_on_map;
+BattlegroundDynamic *dynamic_objects_on_map;
 extern int DEF_IMAGE_SIZE;
 
-static void create_battleground_static(char mapName[], GtkWidget *window,Prototype_map *pr_map)
+static void create_battleground_static(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
 {
     static_objects_on_map = (BattlegroundStatic *)malloc(sizeof(BattlegroundStatic));
     static_objects_on_map->X = pr_map->X;
@@ -23,10 +24,6 @@ static void create_battleground_static(char mapName[], GtkWidget *window,Prototy
         }
     }
 
-    GtkWidget *lay = gtk_layout_new(NULL, NULL);
-    gtk_layout_set_size(GTK_LAYOUT(lay), DEF_IMAGE_SIZE * 11, DEF_IMAGE_SIZE * 7);
-    gtk_container_add(GTK_CONTAINER(window), lay);
-
     for (int i = 0; i < pr_map->Y; i++)
     {
         for (int q = 0; q < pr_map->X; q++)
@@ -35,6 +32,10 @@ static void create_battleground_static(char mapName[], GtkWidget *window,Prototy
                 gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
         }
     }
+}
+
+static void create_battleground__static_top(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
+{
 
     for (int i = 0; i < pr_map->Y; i++)
     {
@@ -46,7 +47,66 @@ static void create_battleground_static(char mapName[], GtkWidget *window,Prototy
     }
 }
 
-void create_battleground(char mapName[])
+static void create_character(BattlegroundDynamic *map)
+{
+
+    BattlegroundDynamic_element *character[2];
+
+    int b = 0;
+    for (int a = 0; a < map->amount; a++)
+    {
+        if (!strcmp(map->tabOfElements[a]->type, "character"))
+        {
+            character[b] = map->tabOfElements[a];
+            b++;
+        }
+    }
+    extern int characterServerIndexX;
+    extern int characterServerIndexY;
+    extern char *characterImagePathServer;
+    extern char *characterImagePathHost;
+
+    for (int i = 0; i < 2; i++)
+    {
+        if (character[i]->indexStartPointX == characterServerIndexX && character[i]->indexStartPointY == characterServerIndexY)
+        {
+            character[i]->image = gtk_image_new_from_file(characterImagePathServer);
+        }
+        else
+        {
+            character[i]->image = gtk_image_new_from_file(characterImagePathHost);
+        }
+        printf("X%i %i Y:%i %i\n",character[i]->indexStartPointX ,characterServerIndexX,character[i]->indexStartPointY,characterServerIndexY);
+    }
+}
+
+static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
+{
+    dynamic_objects_on_map = (BattlegroundDynamic *)malloc(sizeof(BattlegroundDynamic));
+    dynamic_objects_on_map->amount = amount_of_dynamic_elements(pr_map);
+    dynamic_objects_on_map->tabOfElements = (BattlegroundDynamic_element **)malloc(sizeof(BattlegroundDynamic_element *) * dynamic_objects_on_map->amount);
+
+    int a = 0;
+    for (int i = 0; i < pr_map->Y; i++)
+    {
+        for (int q = 0; q < pr_map->X; q++)
+        {
+            dynamic_objects_on_map->tabOfElements[a] = NULL;
+            dynamic_objects_on_map->tabOfElements[a] = load_battleground_dynamic((pr_map->map + i * pr_map->X + q), q, i);
+            if (dynamic_objects_on_map->tabOfElements[a] != NULL)
+                a++;
+        }
+    }
+
+    create_character(dynamic_objects_on_map);
+    for (int a = 0; a < dynamic_objects_on_map->amount; a++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
+            gtk_layout_put(GTK_LAYOUT(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
+    }
+}
+
+void create_battleground(char mapPath[])
 {
     GtkWidget *window = window_creator_create_window();
 
@@ -54,8 +114,17 @@ void create_battleground(char mapName[])
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
-    Prototype_map *pr_map = prototype_load_map(mapName);
-    create_battleground_static(mapName,window,pr_map);
+    GtkWidget *lay = gtk_layout_new(NULL, NULL);
+    gtk_layout_set_size(GTK_LAYOUT(lay), DEF_IMAGE_SIZE * 11, DEF_IMAGE_SIZE * 7);
+    gtk_container_add(GTK_CONTAINER(window), lay);
+
+    Prototype_map *pr_map = prototype_load_map(mapPath);
+
+    create_battleground_static(window, pr_map, lay);
+
+    create_battleground_dynamic(window, pr_map, lay);
+
+    create_battleground__static_top(window, pr_map, lay);
 
     gtk_widget_show_all(window);
     gtk_main();

@@ -1,16 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "map_loader.h"
 #include "battleground.h"
+#include "settings.h"
 
-#include <stdbool.h>
 
-//#define DEF_IMAGE_SIZE 64
-int DEF_IMAGE_SIZE = 64;
-char folderPathImages[] = "./Images/"; //koniecznie zakończona ukośnikiem
-int maxLengthOfPath = 300;
+extern int DEF_IMAGE_SIZE ;
+extern char folderPathImages[];     //koniecznie zakończona ukośnikiem
+extern char folderPathDynamic[];
+extern int maxLengthOfPath;
 
 static void print_prototype_map(Prototype_map *pr_map)
 {
@@ -85,6 +86,26 @@ Prototype_map *prototype_load_map(char name[])
     return board;
 }
 
+int amount_of_dynamic_elements(Prototype_map *pr_map)
+{
+    if (pr_map == NULL)
+        return 0;
+
+    int b = 0;
+    for (int i = 0; i < pr_map->Y; i++)
+    {
+        for (int q = 0; q < pr_map->X; q++)
+        {
+
+            if (strcmp((pr_map->map + i * pr_map->X + q)->type_of_object, "w") && strcmp((pr_map->map + i * pr_map->X + q)->type_of_object, "p") && strcmp((pr_map->map + i * pr_map->X + q)->type_of_object, "n"))
+                b++;
+        }
+    }
+    return b;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//Elementy statyczne
 void map_create_wall(int x, int y, BattlegroundStatic_element *element)
 {
     element->topimage = NULL;
@@ -310,7 +331,7 @@ void map_create_path(int x, int y, Prototype_map *pr_map, BattlegroundStatic_ele
     {
         sprintf(pathToFileDown, "%s%s", folderPathImages, "path.png");
         sprintf(pathToFileTop, "%s%s", folderPathImages, "wall_down_right.png");
-        set_wall(element, pathToFileDown,pathToFileTop, DEF_IMAGE_SIZE, DEF_IMAGE_SIZE, x, y);
+        set_wall(element, pathToFileDown, pathToFileTop, DEF_IMAGE_SIZE, DEF_IMAGE_SIZE, x, y);
     }
     else if (top == true && right == false && bootom == true && left == false)
     {
@@ -355,6 +376,81 @@ BattlegroundStatic_element *load_battleground_static(Prototype_map_element *prot
     else
     {
         map_create_path(x, y, pr_map, element);
+    }
+
+    return element;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//Elementy dynamiczne
+
+void map_create_std_dynamic(int x, int y, BattlegroundDynamic_element *element, char type[])
+{
+    char pathToFile[maxLengthOfPath];
+    sprintf(pathToFile, "%s%s%s", folderPathDynamic, type, ".png");
+
+    if (strcmp(type, "character"))
+        element->image = gtk_image_new_from_file(pathToFile);
+    else
+        element->image = NULL;
+    element->height = DEF_IMAGE_SIZE;
+    element->with = DEF_IMAGE_SIZE;
+    element->posX = x * DEF_IMAGE_SIZE;
+    element->posY = y * DEF_IMAGE_SIZE;
+    element->colisionCheckX = DEF_IMAGE_SIZE / 2;
+    element->colisionCheckY = DEF_IMAGE_SIZE / 2;
+    element->pivotPosX = DEF_IMAGE_SIZE / 2;
+    element->pivotPosY = DEF_IMAGE_SIZE / 2;
+    element->type = (char *)malloc(sizeof(char) * (strlen(type) + 1));
+    strcpy(element->type, type);
+    element->indexStartPointX = x;
+    element->indexStartPointY = y;
+
+    element->actionRange = 0;
+    element->speed = 0;
+
+    element->objectData = NULL;
+    element->viewData = NULL;
+}
+
+void set_character_image(BattlegroundDynamic_element *element,char path[]){
+
+
+}
+
+
+BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *prototype_element, int x, int y) //x i y to numery indeksu
+{
+    BattlegroundDynamic_element *element = (BattlegroundDynamic_element *)malloc(sizeof(BattlegroundDynamic_element));
+
+    if (!strcmp(prototype_element->type_of_object, "e"))
+    {
+        map_create_std_dynamic(x, y, element, "princes");
+    }
+    else if (!strcmp(prototype_element->type_of_object, "ch"))
+    {
+        map_create_std_dynamic(x, y, element, "character");
+    }
+    else if (!strcmp(prototype_element->type_of_object, "g"))
+    {
+        map_create_std_dynamic(x, y, element, "gate");
+    }
+    else if (!strcmp(prototype_element->type_of_object, "t"))
+    {
+        map_create_std_dynamic(x, y, element, "trap");
+    }
+    else if (!strcmp(prototype_element->type_of_object, "m"))
+    {
+        map_create_std_dynamic(x, y, element, "monster");
+    }
+    else if (!strcmp(prototype_element->type_of_object, "k"))
+    {
+        map_create_std_dynamic(x, y, element, "key");
+    }
+    else
+    {
+        free(element);
+        element = NULL;
     }
 
     return element;

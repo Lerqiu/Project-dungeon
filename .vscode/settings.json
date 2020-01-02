@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "battleground.h": "c",
+        "stdlib.h": "c"
+    }
+}

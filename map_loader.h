@@ -18,5 +18,7 @@ typedef struct prototype_map
 
 Prototype_map *prototype_load_map(char name[]);
 BattlegroundStatic_element *load_battleground_static(Prototype_map_element *prototype_element, int x, int y, Prototype_map *pr_map);//x i y to numery indeksu
+int amount_of_dynamic_elements(Prototype_map *pr_map);
+BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *prototype_element, int x, int y); //x i y to numery indeksu
 
 #endif
