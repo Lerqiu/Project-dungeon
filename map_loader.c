@@ -13,6 +13,7 @@ extern char folderPathDynamic[];
 extern int maxLengthOfPath;
 extern int defaultMonsterSpeed;
 extern int defaultCharacterSpeed;
+extern int defaultCharacterActionRangePx;
 
 static void print_prototype_map(Prototype_map *pr_map)
 {
@@ -431,10 +432,27 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         element->colisionCheckY = DEF_IMAGE_SIZE / 4;
         element->colisionCheckX = DEF_IMAGE_SIZE / 4;
         element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
+        element->actionRange=defaultCharacterActionRangePx;
+
+        CharacterData *data = (CharacterData *)malloc(sizeof(CharacterData));
+            data->hadj = NULL;
+            data->vadj = NULL;
+            for(int i=0;i<4;i++)
+            data->keyTab[i]=0;
+        element->objectData=(void*)data;
     }
     else if (!strcmp(prototype_element->type_of_object, "g"))
     {
         map_create_std_dynamic(x, y, element, "gate");
+        GateData *data=(GateData*)malloc(sizeof(GateData));
+        data->isOpen=false;
+        data->key_type=prototype_element->v1;
+        if(data->key_type<0)
+            {
+                printf(u8"Error: Niepodano typu klucza otwierającego bramę Y:%i X:%i, błędna mapa!!!\n",y,x);
+                exit(1);
+            }
+        element->objectData=(void*)data;
     }
     else if (!strcmp(prototype_element->type_of_object, "t"))
     {
@@ -447,10 +465,28 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         element->colisionCheckY = DEF_IMAGE_SIZE / 4;
         element->colisionCheckX = DEF_IMAGE_SIZE / 4;
         element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
+
+        MonsterData *m = (MonsterData*)malloc(sizeof(MonsterData));
+        m->direction=prototype_element->v1;
+        m->amountsOfSteps=prototype_element->v2;
+
+        element->objectData=(void*)m;
     }
     else if (!strcmp(prototype_element->type_of_object, "k"))
     {
         map_create_std_dynamic(x, y, element, "key");
+        KeyData *k=(KeyData*)malloc(sizeof(KeyData));
+        k->key_type=prototype_element->v1;
+        char pathToFile[maxLengthOfPath];
+        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "key_s", ".png");
+        k->smalImagePath=(char*)malloc(sizeof(char)*(strlen(pathToFile)+1));
+        strcpy(k->smalImagePath,pathToFile);
+         if(k->key_type<0)
+            {
+                printf(u8"Error: Niepodano typu klucza Y:%i X:%i, błędna mapa!!!\n",y,x);
+                exit(1);
+            }
+        element->objectData=(void*)k;
     }
     else
     {

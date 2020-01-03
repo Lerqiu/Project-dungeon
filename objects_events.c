@@ -18,19 +18,20 @@ extern int windowHeight;
 extern int windowWidth;
 
 extern BattlegroundStatic *static_objects_on_map;
+extern BattlegroundDynamic *dynamic_objects_on_map;
 extern int DEF_IMAGE_SIZE;
 
-bool isColisionCircle_Square(BattlegroundDynamic_element *object, int X, int Y)
+bool isCharacterOnPath(BattlegroundDynamic_element *object, int X, int Y)
 {
     if (strcmp("path", static_objects_on_map->map[(Y / DEF_IMAGE_SIZE) * static_objects_on_map->X + X / DEF_IMAGE_SIZE]->type))
         return true;
 
-    printf("%i %i\n", (Y / DEF_IMAGE_SIZE) * static_objects_on_map->X, X / DEF_IMAGE_SIZE);
+    //printf("%i %i\n", (Y / DEF_IMAGE_SIZE) * static_objects_on_map->X, X / DEF_IMAGE_SIZE);
     for (int i = 0; i < 8; i++)
     {
         if (strcmp("path", static_objects_on_map->map[(int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y)) / DEF_IMAGE_SIZE) * static_objects_on_map->X + (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX) + X) / DEF_IMAGE_SIZE)]->type))
         {
-            printf("%s %i %i\n", static_objects_on_map->map[(int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y) / DEF_IMAGE_SIZE) * static_objects_on_map->X) + (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX + X) / DEF_IMAGE_SIZE))]->type, (int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y) / DEF_IMAGE_SIZE) * static_objects_on_map->X), (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX + X) / DEF_IMAGE_SIZE)));
+            //printf("%s %i %i\n", static_objects_on_map->map[(int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y) / DEF_IMAGE_SIZE) * static_objects_on_map->X) + (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX + X) / DEF_IMAGE_SIZE))]->type, (int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y) / DEF_IMAGE_SIZE) * static_objects_on_map->X), (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX + X) / DEF_IMAGE_SIZE)));
             return true;
         }
     }
@@ -57,6 +58,153 @@ bool isColisionCircle_Square(BattlegroundDynamic_element *object, int X, int Y)
     return false;
 }
 
+bool isColisionDynamic(BattlegroundDynamic_element *character_or_monster, BattlegroundDynamic_element *obj)
+{
+
+    if (strcmp("character", character_or_monster->type) && strcmp("monster", character_or_monster->type))
+    {
+        // printf(u8"Error! Niepoprawny typ, parametr1 funkcja isColisionDynamic\n");
+        return false;
+    }
+
+    if (!strcmp("character", obj->type) || !strcmp("monster", obj->type))
+    {
+        int a = abs((character_or_monster->posX + character_or_monster->pivotPosX) - (obj->posX + obj->pivotPosX));
+        int b = abs((character_or_monster->posY + character_or_monster->pivotPosY) - (obj->posY + obj->pivotPosY));
+
+        double c = sqrt(a * a + b * b);
+        if (c > character_or_monster->colisionCheckX + obj->colisionCheckX)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+
+        for (int i = 0; i < 8; i++)
+        {
+            int y = (((sin((2.0 / 8.0 * i * 3.14))) * character_or_monster->colisionCheckY + character_or_monster->posY + character_or_monster->pivotPosY));
+            int x = (((cos(2.0 / 8.0 * i * 3.14) * character_or_monster->colisionCheckX + character_or_monster->posX + character_or_monster->pivotPosX)));
+
+            if ((obj->posX + obj->pivotPosX + obj->colisionCheckX) >= (x) && (obj->posX + obj->pivotPosX - obj->colisionCheckX) <= (x) && (obj->posY + obj->pivotPosY + obj->colisionCheckY) >= (y) && (obj->posY + obj->pivotPosY - obj->colisionCheckY) <= (y))
+            {
+                //printf("Character posY:%i posX:%i pivY:%i pivX:%i suma Y:%i X:%i\n",character_or_monster->posY, character_or_monster->posX ,character_or_monster->pivotPosY, character_or_monster->pivotPosX,character_or_monster->posY + character_or_monster->pivotPosY,character_or_monster->posX + character_or_monster->pivotPosX);
+                //printf("Gate posY:%i posX:%i pivY:%i pivX:%i suma Y:%i X:%i s:%i\n",obj->posY, obj->posX ,obj->pivotPosY, obj->pivotPosX,obj->posY + obj->pivotPosY,obj->posX + obj->pivotPosX,obj->indexStartPointY);
+                //printf("y:%i x:%i\n",y,x);
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool isCharacterInRangeOfAction(BattlegroundDynamic_element *character, BattlegroundDynamic_element *obj)
+{
+    for (int i = 0; i < 8; i++)
+    {
+
+        int y = (((sin((2.0 / 8.0 * i * 3.14))) * character->actionRange + character->posY + character->pivotPosY));
+        int x = (((cos(2.0 / 8.0 * i * 3.14) * character->actionRange + character->posX + character->pivotPosX)));
+
+        if ((obj->posX + obj->pivotPosX + obj->colisionCheckX) >= (x) && (obj->posX + obj->pivotPosX - obj->colisionCheckX) <= (x) && (obj->posY + obj->pivotPosY + obj->colisionCheckY) >= (y) && (obj->posY + obj->pivotPosY - obj->colisionCheckY) <= (y))
+            return true;
+    }
+
+    return false;
+}
+
+bool characterColisionGate(BattlegroundDynamic_element *object, int oX, int oY)
+{
+    int x, y;
+    x = object->posX;
+    y = object->posY;
+    object->posX = oX - object->pivotPosX;
+    object->posY = oY - object->pivotPosY;
+
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
+        {
+            GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+
+            if (g->isOpen == false && isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+            {
+                object->posX = x;
+                object->posY = y;
+                return true;
+            }
+        }
+    }
+    object->posX = x;
+    object->posY = y;
+
+    return false;
+}
+
+void characterGetKey(BattlegroundDynamic_element *object)
+{
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "key"))
+        {
+            if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+            {
+                KeyData *k = (KeyData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                CharacterData *ch = (CharacterData *)object->objectData;
+
+                if (k->key_type < 4 && k->key_type >= 0)
+                    ch->keyTab[k->key_type]++;
+                gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
+                gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
+                //gtk_widget_destroy(dynamic_objects_on_map->tabOfElements[i]->image);
+                dynamic_objects_on_map->tabOfElements[i]->image = NULL;
+
+                free(dynamic_objects_on_map->tabOfElements[i]->type);
+                dynamic_objects_on_map->tabOfElements[i]->type = "key picked";
+            }
+        }
+    }
+}
+
+void characterKeyUse(BattlegroundDynamic_element *object, int key)
+{
+    CharacterData *ch = (CharacterData *)object->objectData;
+    if (key >= 4 || key < 0)
+        return;
+    if (ch->keyTab[key] <= 0)
+        return;
+
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
+        {
+
+            if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
+            {
+                GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                if (g->key_type == key && !g->isOpen)
+                {
+                    ch->keyTab[key]--;
+                    g->isOpen = true;
+
+                    gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
+                    gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
+                    dynamic_objects_on_map->tabOfElements[i]->image = NULL;
+
+                    free(dynamic_objects_on_map->tabOfElements[i]->type);
+                    dynamic_objects_on_map->tabOfElements[i]->type = "gate opened";
+                }
+            }
+        }
+    }
+}
+
 static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
 {
     int x = object->posX + oX + object->pivotPosX;
@@ -64,13 +212,16 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
 
     // printf("y:%i x:%i\n", y, x);
 
-    if (isColisionCircle_Square(object, x, y) == false)
+    if (isCharacterOnPath(object, x, y) == false && characterColisionGate(object, x, y) == false)
     {
         object->posX = object->posX + oX;
         object->posY = object->posY + oY;
         if (object->image != NULL)
             gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
     }
+    characterGetKey(object);
+    for (int i = 0; i < 4; i++)
+        characterKeyUse(object, i);
 }
 
 void set_view_center_By_Character(void *ob)

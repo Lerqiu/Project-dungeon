@@ -19,6 +19,7 @@ bool reverseKeyBoard = false;
 char *mapPath = NULL;
 int defaultMonsterSpeed = 13;
 int defaultCharacterSpeed = 10;
+int defaultCharacterActionRangePx=64/2;
 long long int loopTime;
 int mapRows;
 int mapColumns;

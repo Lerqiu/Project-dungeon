@@ -87,10 +87,6 @@ static void create_character(BattlegroundDynamic *map)
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathServer);
             mainCharacter = character[i];
-            mainCharacter->objectData = (void *)malloc(sizeof(CharacterData));
-            CharacterData *data = (CharacterData *)(mainCharacter->objectData);
-            data->hadj = NULL;
-            data->vadj = NULL;
         }
         else
         {
