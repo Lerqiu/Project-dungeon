@@ -129,17 +129,18 @@ bool characterColisionGate(BattlegroundDynamic_element *object, int oX, int oY)
 
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
-        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
-        {
-            GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
-
-            if (g->isOpen == false && isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
             {
-                object->posX = x;
-                object->posY = y;
-                return true;
+                GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+
+                if (g->isOpen == false && isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+                {
+                    object->posX = x;
+                    object->posY = y;
+                    return true;
+                }
             }
-        }
     }
     object->posX = x;
     object->posY = y;
@@ -151,24 +152,24 @@ void characterGetKey(BattlegroundDynamic_element *object)
 {
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
-        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "key"))
-        {
-            if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "key"))
             {
-                KeyData *k = (KeyData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
-                CharacterData *ch = (CharacterData *)object->objectData;
+                if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+                {
+                    KeyData *k = (KeyData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                    CharacterData *ch = (CharacterData *)object->objectData;
 
-                if (k->key_type < 4 && k->key_type >= 0)
-                    ch->keyTab[k->key_type]++;
-                gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
-                gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
-                //gtk_widget_destroy(dynamic_objects_on_map->tabOfElements[i]->image);
-                dynamic_objects_on_map->tabOfElements[i]->image = NULL;
+                    if (k->key_type < 4 && k->key_type >= 0)
+                        ch->keyTab[k->key_type]++;
+                    gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
+                    gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
+                    dynamic_objects_on_map->tabOfElements[i]->image = NULL;
 
-                free(dynamic_objects_on_map->tabOfElements[i]->type);
-                dynamic_objects_on_map->tabOfElements[i]->type = "key picked";
+                    free(dynamic_objects_on_map->tabOfElements[i]);
+                    dynamic_objects_on_map->tabOfElements[i] = NULL;
+                }
             }
-        }
     }
 }
 
@@ -182,46 +183,141 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
 
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
-        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
-        {
-
-            if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
             {
-                GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
-                if (g->key_type == key && !g->isOpen)
+
+                if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
                 {
-                    ch->keyTab[key]--;
-                    g->isOpen = true;
+                    GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                    if (g->key_type == key && !g->isOpen)
+                    {
+                        ch->keyTab[key]--;
+                        g->isOpen = true;
 
-                    gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
-                    gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
-                    dynamic_objects_on_map->tabOfElements[i]->image = NULL;
+                        gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
+                        gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
+                        dynamic_objects_on_map->tabOfElements[i]->image = NULL;
 
-                    free(dynamic_objects_on_map->tabOfElements[i]->type);
-                    dynamic_objects_on_map->tabOfElements[i]->type = "gate opened";
+                        free(dynamic_objects_on_map->tabOfElements[i]);
+                        dynamic_objects_on_map->tabOfElements[i] = NULL;
+                    }
                 }
             }
-        }
     }
+}
+
+bool characterStepOnTrap(BattlegroundDynamic_element *object)
+{
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "trap"))
+            {
+                if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+                {
+                    //Wejście na pułapkę
+                    if (!strcmp(object->type, "character"))
+                    {
+                        printf("You died!! funkcja:characterStepOnTrap\n");
+                    }
+
+                    return true;
+                }
+            }
+    }
+    return false;
+}
+
+bool characterSavePrinces(BattlegroundDynamic_element *object)
+{
+    if (object == NULL)
+        return false;
+    if (strcmp(object->type, "character"))
+        return false;
+
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "princess"))
+            {
+                if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
+                {
+                    //Uratowanie księżniczki
+                    if (!strcmp(object->type, "character"))
+                    {
+                        printf("Princess is saved!! funkcja:characterSavePrinces\n");
+                    }
+
+                    return true;
+                }
+            }
+    }
+    return false;
 }
 
 static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
 {
+    if (object == NULL)
+        return;
+
     int x = object->posX + oX + object->pivotPosX;
     int y = object->posY + oY + object->pivotPosY;
 
-    // printf("y:%i x:%i\n", y, x);
-
-    if (isCharacterOnPath(object, x, y) == false && characterColisionGate(object, x, y) == false)
+    if (!strcmp(object->type, "character"))
     {
-        object->posX = object->posX + oX;
-        object->posY = object->posY + oY;
-        if (object->image != NULL)
-            gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+        if (isCharacterOnPath(object, x, y) == false && characterColisionGate(object, x, y) == false)
+        {
+            object->posX = object->posX + oX;
+            object->posY = object->posY + oY;
+            if (object->image != NULL)
+                gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+        }
+        characterGetKey(object);
+        for (int i = 0; i < 4; i++)
+            characterKeyUse(object, i);
+
+        characterStepOnTrap(object);
+        characterSavePrinces(object);
     }
-    characterGetKey(object);
-    for (int i = 0; i < 4; i++)
-        characterKeyUse(object, i);
+    else
+    {
+        if (strcmp(object->type, "monster"))
+            return;
+        if (isCharacterOnPath(object, x, y) == false)
+        {
+            bool colision = false;
+
+            for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+            {
+                if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+                    if (strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "character"))
+                    {
+                        if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
+                        {
+                            colision = true;
+                            break;
+                        }
+                    }
+            }
+
+            if (colision == false)
+            {
+                object->posX = object->posX + oX;
+                object->posY = object->posY + oY;
+                if (object->image != NULL)
+                    gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+            }
+            else
+            {
+
+                MonsterData *m = (MonsterData *)object->objectData;
+                m->direction -= 2;
+                if (m->direction < 0)
+                    m->direction = 4 + m->direction;
+            }
+        }
+    }
 }
 
 void set_view_center_By_Character(void *ob)
@@ -242,58 +338,40 @@ void set_view_center_By_Character(void *ob)
 void objects_movie_up(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
+
+    make_move(object, 0, -object->speed);
     if (!strcmp(object->type, "character"))
-    {
-        make_move(object, 0, -defaultCharacterSpeed);
         set_view_center_By_Character(object);
-    }
-    else
-    {
-        make_move(object, 0, -defaultMonsterSpeed);
-    }
 
     //printf("UP\n");
 }
 void objects_movie_right(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
+
+    make_move(object, object->speed, 0);
     if (!strcmp(object->type, "character"))
-    {
-        make_move(object, defaultCharacterSpeed, 0);
         set_view_center_By_Character(object);
-    }
-    else
-    {
-        make_move(object, defaultMonsterSpeed, 0);
-    }
+
     //printf("right\n");
 }
 void objects_movie_down(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
+
+    make_move(object, 0, +object->speed);
     if (!strcmp(object->type, "character"))
-    {
-        make_move(object, 0, +defaultCharacterSpeed);
         set_view_center_By_Character(object);
-    }
-    else
-    {
-        make_move(object, 0, +defaultMonsterSpeed);
-    }
+
     //printf("dowm\n");
 }
 void objects_movie_left(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
+
+    make_move(object, -object->speed, 0);
     if (!strcmp(object->type, "character"))
-    {
-        make_move(object, -defaultCharacterSpeed, 0);
         set_view_center_By_Character(object);
-    }
-    else
-    {
-        make_move(object, -defaultMonsterSpeed, 0);
-    }
     // printf("left\n");
 }
 

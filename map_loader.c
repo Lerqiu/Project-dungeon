@@ -423,7 +423,7 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
 
     if (!strcmp(prototype_element->type_of_object, "e"))
     {
-        map_create_std_dynamic(x, y, element, "princes");
+        map_create_std_dynamic(x, y, element, "princess");
     }
     else if (!strcmp(prototype_element->type_of_object, "ch"))
     {

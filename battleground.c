@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <stdbool.h>
+#include <string.h>
+
 #include "battleground.h"
 #include "window_creator.h"
 #include "map_loader.h"
 #include "objects_events.h"
+#include "settings.h"
 
 BattlegroundStatic *static_objects_on_map;
 BattlegroundDynamic *dynamic_objects_on_map;
@@ -21,6 +24,9 @@ extern int windowHeight;
 
 extern int mapRows;
 extern int mapColumns;
+
+extern bool isServer;
+extern  char gameName[];
 
 BattlegroundDynamic_element *mainCharacter;
 
@@ -133,12 +139,21 @@ void create_battleground(char mapPath[])
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
+    char *name;
+
+    if (isServer == true)
+        name=FullName_Path_get(gameName, " Server");
+    else
+       name=FullName_Path_get(gameName, " Host");
+
+    gtk_window_set_title(GTK_WINDOW(window), name);
+
     hadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
     vadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
 
     GtkWidget *lay = gtk_layout_new(hadj, vadj);
 
-    gtk_layout_set_size(GTK_LAYOUT(lay),mapRows*DEF_IMAGE_SIZE, mapColumns*DEF_IMAGE_SIZE);
+    gtk_layout_set_size(GTK_LAYOUT(lay), mapRows * DEF_IMAGE_SIZE, mapColumns * DEF_IMAGE_SIZE);
     gtk_container_add(GTK_CONTAINER(window), lay);
 
     Prototype_map *pr_map = prototype_load_map(mapPath);
@@ -149,7 +164,7 @@ void create_battleground(char mapPath[])
 
     create_battleground__static_top(window, pr_map, lay);
 
-    set_view_center_By_Character((void*)mainCharacter);
+    set_view_center_By_Character((void *)mainCharacter);
 
     //sterowanie postacią
     gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);

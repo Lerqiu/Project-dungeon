@@ -10,8 +10,11 @@ int DEF_IMAGE_SIZE = 64;
 int maxLengthOfPath = 300;
 char folderPathImages[] = "./Images/Path/";     //koniecznie zakończona ukośnikiem
 char folderPathDynamic[] = "./Images/Dynamic/"; //koniecznie zakończona ukośnikiem
-int windowWidth=64*11;
-int windowHeight=64*7;
+char folderPathMaps[] = "./Maps/";              //koniecznie zakończona ukośnikiem
+char folderPathOthers[] = "./Images/Others/";
+int windowWidth = 64 * 11;
+int windowHeight = 64 * 7;
+char gameName[] = "Save the princes";
 
 //Ustawienia gry
 bool isServer = true;
@@ -19,7 +22,7 @@ bool reverseKeyBoard = false;
 char *mapPath = NULL;
 int defaultMonsterSpeed = 13;
 int defaultCharacterSpeed = 10;
-int defaultCharacterActionRangePx=64/2;
+int defaultCharacterActionRangePx = 64 / 2;
 long long int loopTime;
 int mapRows;
 int mapColumns;
@@ -36,5 +39,16 @@ char *characterImagePathHost = NULL;
 int characterHostIndexX;
 int characterHostIndexY;
 
-GtkAdjustment *hadj=NULL;
-GtkAdjustment *vadj=NULL;
+GtkAdjustment *hadj = NULL;
+GtkAdjustment *vadj = NULL;
+
+//Potoki
+//A <- server
+//B <- host
+
+char *FullName_Path_get(char a[], char b[])
+{
+    char *buffer = (char *)malloc(sizeof(char) * (maxLengthOfPath));
+    sprintf(buffer, "%s%s", a, b);
+    return buffer;
+}

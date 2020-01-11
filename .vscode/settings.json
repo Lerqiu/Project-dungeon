@@ -2,6 +2,7 @@
     "files.associations": {
         "battleground.h": "c",
         "stdlib.h": "c",
-        "objects_events.h": "c"
+        "objects_events.h": "c",
+        "typeinfo": "c"
     }
 }
