@@ -2,9 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "map_loader.h"
 #include "settings.h"
+#include "fifo.h"
+
+//Potrzebne w setConnection
+extern bool isServer;
+extern char *mapPath;
+extern bool reverseKeyBoard;
+extern char folderPathMaps[];
+extern char *mapPath;
+extern int maxLengthOfPath;
+
+extern int timeForConnectionCheck;
 
 //Ustawienia postaci servera
 extern char *characterNameServer;
@@ -19,12 +31,13 @@ extern int characterHostIndexX;
 extern int characterHostIndexY;
 extern int mapRows;
 extern int mapColumns;
+
 void set_characters_index(char pathToMap[])
 {
 
     Prototype_map *pr_map = prototype_load_map(pathToMap);
-    mapRows=pr_map->X;
-    mapColumns=pr_map->Y;
+    mapRows = pr_map->X;
+    mapColumns = pr_map->Y;
 
     int tabX[2];
     int tabY[2]; //Indexy postaci
@@ -58,23 +71,220 @@ void set_characters_index(char pathToMap[])
     characterHostIndexY = tabY[1];
 }
 
-void set_connection(char pathToMap[])
+void set_connection_pp(char pathToMap[])
 {
 
     extern bool isServer;
     isServer = true;
 
-    extern char *mapPath;
     mapPath = (char *)malloc(sizeof(char) * (strlen(pathToMap) + 1));
     strcpy(mapPath, pathToMap);
 
     //Ustawienia postaci servera
     characterNameServer = "Lerqiu";
-    characterImagePathServer = "./Images/Dynamic/character_server.png";
 
     //Ustawienia postaci hosta
     characterNameHost = "Berqiu";
-    characterImagePathHost = "./Images/Dynamic/character_host.png";
 
-    set_characters_index(pathToMap);
+    //set_characters_index(pathToMap);
+}
+
+int amount_of_checks; //= timeForConnectionCheck;
+GtkWidget *dialPointer = NULL;
+bool isChecking = false;
+
+static gboolean wait_for_start_signal_end(void)
+{
+    if (dialPointer != NULL)
+        gtk_widget_destroy(dialPointer);
+    isChecking = false;
+    amount_of_checks = timeForConnectionCheck;
+    dialPointer = NULL;
+    return FALSE;
+}
+
+static gboolean check_start_signal(void)
+{
+    char buffer[1000];
+    int size = 1000;
+    gint64 time = g_get_real_time();
+    gint64 returnTime;
+
+    while (getStringFromPipe(buffer, size) == true)
+    {
+
+        int a = sscanf(buffer, "Ready %li\n", &returnTime);
+        if (a == 1)
+        {
+            // printf("Poprawnie wczytany czas:%li\n", returnTime);
+            if (labs(returnTime - time) < 30 * 1000000)
+            {
+                getStringFromPipe(buffer, size);
+                //printf("%s", buffer);
+                int isServerOther;
+                sscanf(buffer, "isServer %i\n", &isServerOther);
+                int n; //= 1 ? 0 : isServer==true;
+                if (isServer == true)
+                    n = 1;
+                else
+                    n = 0;
+
+                //printf("n:%i\n", n);
+                //printf("isServerOther %i\n", isServerOther);
+                if (n != isServerOther)
+                {
+                    //printf("Poprawnie wczytano typ server/host:%i\n", isServerOther);
+                    if (isServerOther == 1)
+                    {
+                        getStringFromPipe(buffer, size);
+                        // printf("%s", buffer);
+                        char *mapOther;
+                        sscanf(buffer, "Map %s\n", mapOther);
+                        //printf("MAp:%s\n", mapOther);
+                        mapPath = FullName_Path_get(folderPathMaps, mapOther);
+                        //printf("Poprawnie wczytano mapę:%s\n", mapPath);
+                    }
+                    getStringFromPipe(buffer, size);
+                    //printf("%s", buffer);
+                    char *nickOther;
+                    sscanf(buffer, "Nick %s\n", nickOther);
+                    //printf("Nick:%s\n", nickOther);
+                    if (isServerOther == 1)
+                    {
+                        characterNameServer = nickOther;
+                    }
+                    else
+                    {
+                        characterNameHost = nickOther;
+                    }
+                    //printf("Poprawnie wczytano nick:%s\n", nickOther);
+                    getStringFromPipe(buffer, size);
+                    //printf("%s", buffer);
+                    int isKeyBoR;
+                    sscanf(buffer, "isKeyBoR %i\n", &isKeyBoR);
+                    int m; //= 1 ? 0 : reverseKeyBoard;
+                    if (reverseKeyBoard == true)
+                        m = 1;
+                    else
+                        m = 0;
+                    //printf("Poprawnie wczytano keyR:%i\n", isKeyBoR);
+                    if (m != isKeyBoR)
+                    {
+                        //printf("GameStart\n");
+                        wait_for_start_signal_end();
+                        gtk_main_quit();
+                        return FALSE;
+                        //return TRUE;
+                    }
+                }
+            }
+        }
+
+        a = 0;
+    }
+
+    return TRUE;
+}
+
+static gboolean wait_for_start_signal(gpointer data)
+{
+    GtkWidget *window = (GtkWidget *)data;
+    if (dialPointer != NULL)
+        gtk_widget_destroy(dialPointer);
+    dialPointer = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "Sprawdzanie połączenia (trwa %i s). Pozostało: %i", timeForConnectionCheck, amount_of_checks);
+    gtk_widget_show(dialPointer);
+
+    amount_of_checks--;
+    if (amount_of_checks < 0)
+    {
+        GtkWidget *d = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Wprowadzono niepoprawne dane lub minął czas połączenia\nSprawdz czy:\n-Ustawiono odmienne tryby gry\n-Ustawiono odmienne tryby klawiatury");
+        gtk_dialog_run(GTK_DIALOG(d));
+        gtk_widget_destroy(d);
+        return wait_for_start_signal_end();
+    }
+
+    return check_start_signal();
+}
+
+static void send_start_signal(char Nick[], GtkWidget *window)
+{
+    gint64 time = g_get_real_time();
+
+    char buffer[maxLengthOfPath];
+    sprintf(buffer, "Ready %li\n", time);
+    //printf("%s", buffer);
+    sendStringToPipe(buffer);
+
+    if (isServer)
+    {
+        sprintf(buffer, "isServer 1\n");
+    }
+    else
+    {
+        sprintf(buffer, "isServer 0\n");
+    }
+    //printf("%s", buffer);
+    sendStringToPipe(buffer);
+
+    if (isServer)
+    {
+        sprintf(buffer, "Map %s\n", mapPath);
+        //printf("%s", buffer);
+        sendStringToPipe(buffer);
+    }
+
+    sprintf(buffer, "Nick %s\n", Nick);
+    //printf("%s", buffer);
+    sendStringToPipe(buffer);
+
+    if (reverseKeyBoard)
+    {
+        sprintf(buffer, "isKeyBoR 1\n");
+    }
+    else
+    {
+        sprintf(buffer, "isKeyBoR 0\n");
+    }
+    //printf("%s", buffer);
+    //printf("Dane wysłane koniec\n");
+    sendStringToPipe(buffer);
+    g_timeout_add(1000, wait_for_start_signal, window);
+}
+
+static void createMap()
+{
+}
+
+bool isCheckingPipe(void)
+{
+    return isChecking;
+}
+
+void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map, GtkWidget *window)
+{
+    closePipes();
+    isChecking = true;
+
+    amount_of_checks = timeForConnectionCheck;
+
+    isServer = isServerr;
+
+    reverseKeyBoard = isKeyRevert;
+
+    mapPath = Map;
+
+    if (isServer)
+    {
+        characterNameServer = Nick;
+        initPipes("A");
+    }
+    else
+    {
+        characterNameHost = Nick;
+        initPipes("B");
+    }
+
+    send_start_signal(Nick, window);
+
+    //set_characters_index(FullName_Path_get(folderPathMaps, mapPath));
 }

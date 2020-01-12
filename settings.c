@@ -15,6 +15,7 @@ char folderPathOthers[] = "./Images/Others/";
 int windowWidth = 64 * 11;
 int windowHeight = 64 * 7;
 char gameName[] = "Save the princes";
+int timeForConnectionCheck = 30;//w sek
 
 //Ustawienia gry
 bool isServer = true;
@@ -29,13 +30,13 @@ int mapColumns;
 
 //Ustawienia postaci servera
 char *characterNameServer = NULL;
-char *characterImagePathServer = NULL;
+char  *characterImagePathServer = "./Images/Dynamic/character_server.png";
 int characterServerIndexX;
 int characterServerIndexY;
 
 //Ustawienia postaci hosta
 char *characterNameHost = NULL;
-char *characterImagePathHost = NULL;
+char *characterImagePathHost = "./Images/Dynamic/character_host.png";
 int characterHostIndexX;
 int characterHostIndexY;
 

@@ -3,7 +3,7 @@
 
 #include "map_loader.h"
 
-void set_connection(char pathToMap[]);
-
+void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map,GtkWidget *window);
+bool isCheckingPipe(void);
 
 #endif

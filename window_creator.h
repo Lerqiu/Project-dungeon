@@ -3,6 +3,7 @@
 
 #include <gtk/gtk.h>
 
+
 GtkWidget *window_creator_create_window(void);
 void createStartWindow(void);
 
