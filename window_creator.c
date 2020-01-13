@@ -22,11 +22,5 @@ GtkWidget *window_creator_create_window(void)
     return window;
 }
 
-void destroy_window(GtkWidget *window)
-{
-    gtk_main_quit();
-    if (window != NULL)
-        g_object_unref(window);
-}
 
 

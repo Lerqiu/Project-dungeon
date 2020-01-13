@@ -27,7 +27,11 @@ extern int mapRows;
 extern int mapColumns;
 
 extern bool isServer;
-extern  char gameName[];
+extern char gameName[];
+
+extern char *characterNameHost;
+char *characterNameServer;
+
 
 BattlegroundDynamic_element *mainCharacter;
 
@@ -93,11 +97,13 @@ static void create_character(BattlegroundDynamic *map)
         if (character[i]->indexStartPointX == characterServerIndexX && character[i]->indexStartPointY == characterServerIndexY)
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathServer);
+            if(isServer)
             mainCharacter = character[i];
         }
         else
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathHost);
+             if(!isServer)
             mainCharacter = character[i];
         }
         //printf("X%i %i Y:%i %i\n", character[i]->indexStartPointX, characterServerIndexX, character[i]->indexStartPointY, characterServerIndexY);
@@ -136,31 +142,43 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
 void create_battleground(char mapPath[])
 {
     printf("create\n");
-    set_characters_index(mapPath);
+    hadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+    printf("READY9.7.7\n");
+    vadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+    printf("READY9.7.5\n");
+    g_print("Level %i\n",gtk_main_level ());
+    GtkWidget *lay = gtk_layout_new(hadj, vadj);
+    
+    printf("READY9.9\n");
     GtkWidget *window = window_creator_create_window();
+    printf("READY9.9.9\n");
+
+    printf("READY9.6\n");
 
     gtk_window_set_default_size(GTK_WINDOW(window), windowWidth, windowHeight);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    printf("READY9\n");
 
     char *name;
 
     if (isServer == true)
-        name=FullName_Path_get(gameName, " Server");
+        name = FullName_Path_get(gameName, characterNameServer);
     else
-       name=FullName_Path_get(gameName, " Host");
+        name = FullName_Path_get(gameName, characterNameHost);
+
+    printf("READY9.8\n");
 
     gtk_window_set_title(GTK_WINDOW(window), name);
-
-    hadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
-    vadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
-
-    GtkWidget *lay = gtk_layout_new(hadj, vadj);
+    printf("READY9.7\n");
 
     gtk_layout_set_size(GTK_LAYOUT(lay), mapRows * DEF_IMAGE_SIZE, mapColumns * DEF_IMAGE_SIZE);
     gtk_container_add(GTK_CONTAINER(window), lay);
+    printf("READY8\n");
 
     Prototype_map *pr_map = prototype_load_map(mapPath);
+
+    set_characters_index(pr_map);
 
     create_battleground_static(window, pr_map, lay);
 
@@ -169,6 +187,7 @@ void create_battleground(char mapPath[])
     create_battleground__static_top(window, pr_map, lay);
 
     set_view_center_By_Character((void *)mainCharacter);
+    printf("READY7\n");
 
     //sterowanie postacią
     gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);
@@ -183,5 +202,6 @@ void create_battleground(char mapPath[])
     }
 
     gtk_widget_show_all(window);
+    printf("READY1\n");
     gtk_main();
 }

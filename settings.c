@@ -14,13 +14,13 @@ char folderPathMaps[] = "./Maps/";              //koniecznie zakończona ukośni
 char folderPathOthers[] = "./Images/Others/";
 int windowWidth = 64 * 11;
 int windowHeight = 64 * 7;
-char gameName[] = "Save the princes";
+char gameName[] = "Save the princes ";
 int timeForConnectionCheck = 30;//w sek
 
 //Ustawienia gry
 bool isServer = true;
 bool reverseKeyBoard = false;
-char *mapPath = NULL;
+char *mapPath = "./Maps/Dungeon1.txt";
 int defaultMonsterSpeed = 13;
 int defaultCharacterSpeed = 10;
 int defaultCharacterActionRangePx = 64 / 2;

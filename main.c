@@ -13,20 +13,20 @@ extern char *mapPath;
 
 int main(void)
 {
+    gtk_init(NULL, NULL);
     createStartWindow();
-    printf("Buuu\n");
-    sleep(5);
-    /*
-    if (isConnectedPipe() == true)
-    {
+    
+    //if (isConnectedPipe() == true)
+    //{
         //set_connection("./Maps/Dungeon1.txt");
-        printf("Data: %s\n", mapPath);
+        //printf("Data: %s\n", mapPath);
         create_battleground(mapPath);
-    }*/
+        
+    //}
     //set_connection("./Maps/Dungeon1.txt");
     //create_battleground("./Maps/Dungeon1.txt");
 
-    //closePipes();//Zamknięcie potoku init w setConnection
+    closePipes();//Zamknięcie potoku init w setConnection
 
     return 1;
 }

@@ -34,10 +34,8 @@ extern int characterHostIndexY;
 extern int mapRows;
 extern int mapColumns;
 
-void set_characters_index(char pathToMap[])
+void set_characters_index(Prototype_map *pr_map)
 {
-
-    Prototype_map *pr_map = prototype_load_map(pathToMap);
     mapRows = pr_map->X;
     mapColumns = pr_map->Y;
 
@@ -159,6 +157,8 @@ static gboolean check_start_signal(void)
                         destroyWindowSetSoft();
                         destroyLocalWindow();
 
+                        //create_battleground(mapPath);
+
                         return FALSE;
                     }
                 }
@@ -193,6 +193,7 @@ static gboolean wait_for_start_signal(gpointer data)
 
 static void send_start_signal(char Nick[], GtkWidget *window)
 {
+    gtk_layout_new(NULL,NULL);
     gint64 time = g_get_real_time();
 
     char buffer[maxLengthOfPath];

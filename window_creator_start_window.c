@@ -152,27 +152,15 @@ void destroyWindowSetSoft(void)
 }
 void destroyWindow()
 {
-    if (gtk_widget_is_focus(window))
-    {
-        printf("Tak\n");
-    }
-    else
-    {
-        printf("Tak\n");
-    }
-
+    gtk_main_quit();
     if (softWindowDestroy == false)
     {
-        gtk_main_quit();
         closePipes();
     }
 }
 
 void createStartWindow(void)
 {
-
-    gtk_init(NULL, NULL);
-
     CheckCorrectData_Struct *Data = (CheckCorrectData_Struct *)malloc(sizeof(CheckCorrectData_Struct));
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
