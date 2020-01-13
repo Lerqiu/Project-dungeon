@@ -9,6 +9,7 @@
 #include "map_loader.h"
 #include "objects_events.h"
 #include "settings.h"
+#include "connection.h"
 
 BattlegroundStatic *static_objects_on_map;
 BattlegroundDynamic *dynamic_objects_on_map;
@@ -97,6 +98,7 @@ static void create_character(BattlegroundDynamic *map)
         else
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathHost);
+            mainCharacter = character[i];
         }
         //printf("X%i %i Y:%i %i\n", character[i]->indexStartPointX, characterServerIndexX, character[i]->indexStartPointY, characterServerIndexY);
     }
@@ -133,6 +135,8 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
 
 void create_battleground(char mapPath[])
 {
+    printf("create\n");
+    set_characters_index(mapPath);
     GtkWidget *window = window_creator_create_window();
 
     gtk_window_set_default_size(GTK_WINDOW(window), windowWidth, windowHeight);

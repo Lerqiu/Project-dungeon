@@ -7,6 +7,8 @@
 #include "map_loader.h"
 #include "settings.h"
 #include "fifo.h"
+#include "battleground.h"
+#include "window_creator.h"
 
 //Potrzebne w setConnection
 extern bool isServer;
@@ -71,24 +73,6 @@ void set_characters_index(char pathToMap[])
     characterHostIndexY = tabY[1];
 }
 
-void set_connection_pp(char pathToMap[])
-{
-
-    extern bool isServer;
-    isServer = true;
-
-    mapPath = (char *)malloc(sizeof(char) * (strlen(pathToMap) + 1));
-    strcpy(mapPath, pathToMap);
-
-    //Ustawienia postaci servera
-    characterNameServer = "Lerqiu";
-
-    //Ustawienia postaci hosta
-    characterNameHost = "Berqiu";
-
-    //set_characters_index(pathToMap);
-}
-
 int amount_of_checks; //= timeForConnectionCheck;
 GtkWidget *dialPointer = NULL;
 bool isChecking = false;
@@ -138,10 +122,10 @@ static gboolean check_start_signal(void)
                     {
                         getStringFromPipe(buffer, size);
                         // printf("%s", buffer);
-                        char *mapOther;
+                        char *mapOther = (char *)malloc(sizeof(char) * maxLengthOfPath);
                         sscanf(buffer, "Map %s\n", mapOther);
-                        //printf("MAp:%s\n", mapOther);
-                        mapPath = FullName_Path_get(folderPathMaps, mapOther);
+                        //printf("Map:%s\n", mapOther);
+                        mapPath = mapOther;
                         //printf("Poprawnie wczytano mapę:%s\n", mapPath);
                     }
                     getStringFromPipe(buffer, size);
@@ -170,11 +154,12 @@ static gboolean check_start_signal(void)
                     //printf("Poprawnie wczytano keyR:%i\n", isKeyBoR);
                     if (m != isKeyBoR)
                     {
-                        //printf("GameStart\n");
                         wait_for_start_signal_end();
-                        gtk_main_quit();
+                        //gtk_main_quit();
+                        destroyWindowSetSoft();
+                        destroyLocalWindow();
+
                         return FALSE;
-                        //return TRUE;
                     }
                 }
             }
@@ -271,7 +256,7 @@ void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map, Gtk
 
     reverseKeyBoard = isKeyRevert;
 
-    mapPath = Map;
+    mapPath = FullName_Path_get(folderPathMaps, Map);
 
     if (isServer)
     {

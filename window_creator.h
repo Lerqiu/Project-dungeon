@@ -6,5 +6,7 @@
 
 GtkWidget *window_creator_create_window(void);
 void createStartWindow(void);
+void destroyLocalWindow(void);
+void destroyWindowSetSoft(void);
 
 #endif

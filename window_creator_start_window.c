@@ -77,7 +77,7 @@ static void showError(char text[], CheckCorrectData_Struct *data)
 
 static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
 {
-    if(isCheckingPipe())
+    if (isCheckingPipe())
         return;
     char *Nick;
     bool isServer;
@@ -133,13 +133,39 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
         li = li->next;
     }
 
-
-    set_connection(Nick, isServer, isKeyRevert, Map,checkStructData->window);
+    set_connection(Nick, isServer, isKeyRevert, Map, checkStructData->window);
 }
 
-void closeWindow(void){
-    gtk_main_quit();
-    closePipes();
+GtkWidget *window = NULL;
+void destroyLocalWindow(void)
+{
+    if (window != NULL)
+    {
+        gtk_widget_destroy(window);
+        window = NULL;
+    }
+}
+bool softWindowDestroy = false;
+void destroyWindowSetSoft(void)
+{
+    softWindowDestroy = true;
+}
+void destroyWindow()
+{
+    if (gtk_widget_is_focus(window))
+    {
+        printf("Tak\n");
+    }
+    else
+    {
+        printf("Tak\n");
+    }
+
+    if (softWindowDestroy == false)
+    {
+        gtk_main_quit();
+        closePipes();
+    }
 }
 
 void createStartWindow(void)
@@ -149,7 +175,7 @@ void createStartWindow(void)
 
     CheckCorrectData_Struct *Data = (CheckCorrectData_Struct *)malloc(sizeof(CheckCorrectData_Struct));
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     Data->window = window;
     gtk_window_set_title(GTK_WINDOW(window), gameName);
 
@@ -221,10 +247,12 @@ void createStartWindow(void)
     gtk_widget_set_halign(buttonPlay, GTK_ALIGN_END);
     gtk_container_add(GTK_CONTAINER(boxLPlay), buttonPlay);
 
-    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(closeWindow), NULL);
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(destroyWindow), NULL);
     gtk_window_set_default_size(GTK_WINDOW(window), 400, 240 * 2);
 
     gtk_widget_show_all(window);
     gtk_widget_hide(boxLMap);
     gtk_main();
+    //gtk_widget_destroy(window);
+    //gtk_main_iteration_do(TRUE);
 }
