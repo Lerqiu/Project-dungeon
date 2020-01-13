@@ -16,15 +16,10 @@ int main(void)
     gtk_init(NULL, NULL);
     createStartWindow();
     
-    //if (isConnectedPipe() == true)
-    //{
-        //set_connection("./Maps/Dungeon1.txt");
-        //printf("Data: %s\n", mapPath);
+    if (isConnectedPipe() == true)
+    {
         create_battleground(mapPath);
-        
-    //}
-    //set_connection("./Maps/Dungeon1.txt");
-    //create_battleground("./Maps/Dungeon1.txt");
+    }
 
     closePipes();//Zamknięcie potoku init w setConnection
 
