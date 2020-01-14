@@ -11,9 +11,6 @@
 extern int defaultMonsterSpeed;
 extern int defaultCharacterSpeed;
 
-extern GtkAdjustment *hadj;
-extern GtkAdjustment *vadj;
-
 extern int windowHeight;
 extern int windowWidth;
 
@@ -271,7 +268,8 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
             object->posX = object->posX + oX;
             object->posY = object->posY + oY;
             if (object->image != NULL)
-                gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+                //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+                gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
         }
         characterGetKey(object);
         for (int i = 0; i < 4; i++)
@@ -306,7 +304,8 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
                 object->posX = object->posX + oX;
                 object->posY = object->posY + oY;
                 if (object->image != NULL)
-                    gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+                    //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+                    gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
             }
             else
             {
@@ -323,16 +322,19 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
 void set_view_center_By_Character(void *ob)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)ob;
-    //printf("Make view movie\n");
+    printf("Make view movie\n");
     if ((object->objectData) == NULL)
         return;
 
-    //printf(" PosX:%i PosY:%i\n",object->posX,object->posY);
+    //printf(" PosX:%i PosY:%i\n", object->posX - windowWidth / 2, object->posY - windowHeight / 2);
 
     CharacterData *data = (CharacterData *)(object->objectData);
-
-    gtk_adjustment_set_value(hadj, object->posX - windowWidth / 2);
-    gtk_adjustment_set_value(vadj, object->posY - windowHeight / 2);
+    gdouble newX = object->posX - windowWidth / 2;
+    gdouble newY = object->posY - windowHeight / 2;
+    gtk_adjustment_set_value(data->hadj, newX);
+    gtk_adjustment_set_value(data->vadj, newY);
+    g_print("PosX:%f PosY:%f\n", newX, newY);
+    g_print("%f %f\n", gtk_adjustment_get_value(data->hadj), gtk_adjustment_get_value(data->vadj));
 }
 
 void objects_movie_up(gpointer *pointer)

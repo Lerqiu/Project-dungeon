@@ -136,42 +136,38 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
     set_connection(Nick, isServer, isKeyRevert, Map, checkStructData->window);
 }
 
-GtkWidget *window = NULL;
+GtkWidget *scroll = NULL;
 void destroyLocalWindow(void)
 {
-    if (window != NULL)
+    if (scroll != NULL)
     {
-        gtk_widget_destroy(window);
-        window = NULL;
+        gtk_widget_destroy(scroll);
+        scroll = NULL;
     }
-}
-bool softWindowDestroy = false;
-void destroyWindowSetSoft(void)
-{
-    softWindowDestroy = true;
-}
-void destroyWindow()
-{
-    gtk_main_quit();
-    if (softWindowDestroy == false)
-    {
-        closePipes();
-    }
+    printf("Destroyed\n");
 }
 
+void destroyWindow()
+{
+    closePipes();
+    gtk_main_quit();
+}
+GtkWidget *windowMain = NULL;
 void createStartWindow(void)
 {
     CheckCorrectData_Struct *Data = (CheckCorrectData_Struct *)malloc(sizeof(CheckCorrectData_Struct));
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    Data->window = window;
-    gtk_window_set_title(GTK_WINDOW(window), gameName);
+    windowMain = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    Data->window = windowMain;
+    gtk_window_set_title(GTK_WINDOW(windowMain), gameName);
+    gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
 
-    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(window), scroll);
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(windowMain), scroll);
 
     GtkWidget *boxLMain = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(scroll), boxLMain);
+    //gtk_container_add(GTK_CONTAINER(windowMain), boxLMain);
 
     //Nick
     GtkWidget *boxLNick = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -220,7 +216,6 @@ void createStartWindow(void)
 
     //Mapa
     GtkWidget *boxLMap = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_container_add(GTK_CONTAINER(boxLMain), boxLMap);
     Data->radioButtons = createStartWindowShowMap(boxLMap);
     g_signal_connect(GTK_SWITCH(switchSer_Hos), "notify::active", G_CALLBACK(createStartWindowShowHideMaps), boxLMap);
@@ -235,10 +230,10 @@ void createStartWindow(void)
     gtk_widget_set_halign(buttonPlay, GTK_ALIGN_END);
     gtk_container_add(GTK_CONTAINER(boxLPlay), buttonPlay);
 
-    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(destroyWindow), NULL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 240 * 2);
+    g_signal_connect(G_OBJECT(windowMain), "destroy", G_CALLBACK(destroyWindow), NULL);
+    gtk_window_set_default_size(GTK_WINDOW(windowMain), 400, 240 * 2);
 
-    gtk_widget_show_all(window);
+    gtk_widget_show_all(windowMain);
     gtk_widget_hide(boxLMap);
     gtk_main();
     //gtk_widget_destroy(window);

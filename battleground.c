@@ -17,9 +17,6 @@ BattlegroundDynamic *dynamic_objects_on_map;
 extern int DEF_IMAGE_SIZE;
 extern bool reverseKeyBoard;
 
-extern GtkAdjustment *hadj;
-extern GtkAdjustment *vadj;
-
 extern int windowWidth;
 extern int windowHeight;
 
@@ -33,6 +30,7 @@ extern char *characterNameHost;
 char *characterNameServer;
 
 BattlegroundDynamic_element *mainCharacter;
+extern GtkWidget *windowMain;
 
 static void create_battleground_static(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
 {
@@ -54,7 +52,8 @@ static void create_battleground_static(GtkWidget *window, Prototype_map *pr_map,
         for (int q = 0; q < pr_map->X; q++)
         {
             if ((static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage != NULL)
-                gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+                gtk_fixed_put(GTK_FIXED(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+            // gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
         }
     }
 }
@@ -67,7 +66,8 @@ static void create_battleground__static_top(GtkWidget *window, Prototype_map *pr
         for (int q = 0; q < pr_map->X; q++)
         {
             if ((static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage != NULL)
-                gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+                gtk_fixed_put(GTK_FIXED(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+            //gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
         }
     }
 }
@@ -97,13 +97,17 @@ static void create_character(BattlegroundDynamic *map)
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathServer);
             if (isServer)
+            {
                 mainCharacter = character[i];
+            }
         }
         else
         {
             character[i]->image = gtk_image_new_from_file(characterImagePathHost);
             if (!isServer)
+            {
                 mainCharacter = character[i];
+            }
         }
         //printf("X%i %i Y:%i %i\n", character[i]->indexStartPointX, characterServerIndexX, character[i]->indexStartPointY, characterServerIndexY);
     }
@@ -132,7 +136,8 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
     {
         if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
         {
-            gtk_layout_put(GTK_LAYOUT(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
+            //gtk_layout_put(GTK_LAYOUT(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
+            gtk_fixed_put(GTK_FIXED(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
             dynamic_objects_on_map->tabOfElements[a]->layout = lay;
         }
     }
@@ -140,12 +145,17 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
 
 void create_battleground(char mapPath[])
 {
+    //if (windowMain == NULL)
+    //  return;
+    printf("Początek\n");
+    gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 3);
 
-    GtkWidget *window = window_creator_create_window();
+    //GtkWidget *window = window_creator_create_window();
+    //GtkWidget *windowMain = window_creator_create_window();
 
-    gtk_window_set_default_size(GTK_WINDOW(window), windowWidth, windowHeight);
-    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
+    gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
+    gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
 
     char *name;
 
@@ -154,39 +164,58 @@ void create_battleground(char mapPath[])
     else
         name = FullName_Path_get(gameName, characterNameHost);
 
-    gtk_window_set_title(GTK_WINDOW(window), name);
+    gtk_window_set_title(GTK_WINDOW(windowMain), name);
+    printf("Dodano tytuł\n");
 
-    hadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
-    vadj = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
-    GtkWidget *lay = gtk_layout_new(hadj, vadj);
+    GtkAdjustment *hadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+    GtkAdjustment *vadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
+    g_print("%f\n", gtk_adjustment_get_page_size(hadjCharacter));
+    GtkWidget *view = gtk_viewport_new(hadjCharacter, vadjCharacter);
 
-    gtk_layout_set_size(GTK_LAYOUT(lay), mapRows * DEF_IMAGE_SIZE, mapColumns * DEF_IMAGE_SIZE);
-    gtk_container_add(GTK_CONTAINER(window), lay);
+    GtkWidget *lay = gtk_fixed_new();
+    //gtk_layout_new(hadj, vadj);
+    printf("Stworzono layout\n");
+
+    //gtk_layout_set_size(GTK_LAYOUT(lay), mapRows * DEF_IMAGE_SIZE, mapColumns * DEF_IMAGE_SIZE);
+    //gtk_layout_set_size(GTK_LAYOUT(lay), windowWidth, windowHeight);
+    GtkWidget *scrollW = gtk_scrolled_window_new(NULL, NULL);
+    //gtk_scrolled_window_set_overlay_scrolling(,TRUE);
+    gtk_widget_hide(GTK_WIDGET(gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW(scrollW))));
+    gtk_widget_hide(GTK_WIDGET(gtk_scrolled_window_get_hscrollbar (GTK_SCROLLED_WINDOW(scrollW))));
+
+    gtk_container_add(GTK_CONTAINER(view), lay);
+    gtk_container_add(GTK_CONTAINER(scrollW),view);
+    gtk_container_add(GTK_CONTAINER(windowMain), scrollW);
 
     Prototype_map *pr_map = prototype_load_map(mapPath);
 
     set_characters_index(pr_map);
 
-    create_battleground_static(window, pr_map, lay);
+    create_battleground_static(windowMain, pr_map, lay);
 
-    create_battleground_dynamic(window, pr_map, lay);
+    create_battleground_dynamic(windowMain, pr_map, lay);
 
-    create_battleground__static_top(window, pr_map, lay);
+    create_battleground__static_top(windowMain, pr_map, lay);
 
-    set_view_center_By_Character((void *)mainCharacter);
+    CharacterData *characData = (CharacterData *)(mainCharacter->objectData);
+    characData->hadj = gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view));
+    characData->vadj = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view));
+
+     set_view_center_By_Character((void *)mainCharacter);
 
     //sterowanie postacią
-    gtk_widget_add_events(window, GDK_KEY_PRESS_MASK);
+    gtk_widget_add_events(windowMain, GDK_KEY_PRESS_MASK);
 
     if (reverseKeyBoard == true)
     {
-        g_signal_connect(G_OBJECT(window), "key_press_event", G_CALLBACK(objects_movie_Key_Reverse), mainCharacter);
+        g_signal_connect(G_OBJECT(windowMain), "key_press_event", G_CALLBACK(objects_movie_Key_Reverse), mainCharacter);
     }
     else
     {
-        g_signal_connect(G_OBJECT(window), "key_press_event", G_CALLBACK(objects_movie), mainCharacter);
+        g_signal_connect(G_OBJECT(windowMain), "key_press_event", G_CALLBACK(objects_movie), mainCharacter);
     }
 
-    gtk_widget_show_all(window);
-    gtk_main();
+    gtk_widget_show_all(windowMain);
+    //printf("All correct\n");
+   // gtk_main();
 }

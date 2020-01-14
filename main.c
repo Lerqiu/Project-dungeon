@@ -16,12 +16,12 @@ int main(void)
     gtk_init(NULL, NULL);
     createStartWindow();
     
-    if (isConnectedPipe() == true)
-    {
-        create_battleground(mapPath);
-    }
+    //if (isConnectedPipe() == true)
+   // {
+        //create_battleground(mapPath);
+    //}
 
-    closePipes();//Zamknięcie potoku init w setConnection
+   // closePipes();//Zamknięcie potoku init w setConnection
 
     return 1;
 }

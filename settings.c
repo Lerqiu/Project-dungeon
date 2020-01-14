@@ -40,9 +40,6 @@ char *characterImagePathHost = "./Images/Dynamic/character_host.png";
 int characterHostIndexX;
 int characterHostIndexY;
 
-GtkAdjustment *hadj = NULL;
-GtkAdjustment *vadj = NULL;
-
 //Potoki
 //A <- server
 //B <- host

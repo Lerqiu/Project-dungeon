@@ -154,10 +154,10 @@ static gboolean check_start_signal(void)
                     {
                         wait_for_start_signal_end();
                         //gtk_main_quit();
-                        destroyWindowSetSoft();
+                        //destroyWindowSetSoft();
                         destroyLocalWindow();
-
-                        //create_battleground(mapPath);
+                        gtk_main_iteration_do (FALSE);
+                        create_battleground(mapPath);
 
                         return FALSE;
                     }
@@ -193,7 +193,7 @@ static gboolean wait_for_start_signal(gpointer data)
 
 static void send_start_signal(char Nick[], GtkWidget *window)
 {
-    gtk_layout_new(NULL,NULL);
+    //gtk_layout_new(NULL,NULL);
     gint64 time = g_get_real_time();
 
     char buffer[maxLengthOfPath];
