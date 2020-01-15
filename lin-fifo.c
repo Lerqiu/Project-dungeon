@@ -16,7 +16,7 @@ struct pipes
 
 #define MAKS_DL_TEKSTU 10000
 
-static PipesPtr potoki=NULL;
+static PipesPtr potoki = NULL;
 static char *moj_id, *twoj_id;
 
 int fileno(FILE *file);
@@ -26,12 +26,12 @@ static FILE *openInPipe(char *name);
 void closePipes(void)
 {
     PipesPtr pipes = potoki;
-    if(potoki == NULL)
+    if (potoki == NULL)
         return;
     fclose(pipes->fifo_in);
     fclose(pipes->fifo_out);
     free(potoki);
-    potoki=NULL;
+    potoki = NULL;
 }
 
 void initPipes(char argv[])
@@ -92,23 +92,35 @@ static FILE *openInPipe(char *name)
 
 void sendStringToPipe(const char *data)
 {
+    if (data == NULL)
+        return;
+
     PipesPtr pipes = potoki;
     int result = fprintf(pipes->fifo_out, "%s", data);
     fflush(pipes->fifo_out);
     if (result == 0)
         printf("Failed to send data\n");
+
+    //printf("Tekst wysłany: %s", data);
 }
 
 bool getStringFromPipe(char *buffer, size_t size)
 {
+    if (buffer == NULL)
+        return false;
+
     PipesPtr pipes = potoki;
     char *result = fgets(buffer, size, pipes->fifo_in);
     fflush(pipes->fifo_in);
+
+    //printf("Tekst odebrany: %s", buffer);
+
     return result != NULL;
 }
 
-bool isConnectedPipe(void){
-    if(potoki==NULL)
+bool isConnectedPipe(void)
+{
+    if (potoki == NULL)
         return false;
     return true;
 }

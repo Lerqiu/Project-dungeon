@@ -17,7 +17,7 @@ extern char folderPathOthers[];
 
 //Okienko startowe
 
-GSList *createStartWindowShowMap(GtkWidget *parentContainer)
+static GSList *createStartWindowShowMap(GtkWidget *parentContainer)
 {
     DIR *d;
     struct dirent *dir;
@@ -44,7 +44,7 @@ GSList *createStartWindowShowMap(GtkWidget *parentContainer)
     return glist;
 }
 
-gboolean createStartWindowShowHideMaps(GtkWidget *widget, GParamSpec *pspec, gpointer data)
+static gboolean createStartWindowShowHideMaps(GtkWidget *widget, GParamSpec *pspec, gpointer data)
 {
     GtkWidget *p = (GtkWidget *)(data);
     if (gtk_switch_get_active(GTK_SWITCH(widget)))
@@ -136,18 +136,17 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
     set_connection(Nick, isServer, isKeyRevert, Map, checkStructData->window);
 }
 
-GtkWidget *scroll = NULL;
-void destroyLocalWindow(void)
+static GtkWidget *scroll = NULL;
+void destroyStartWindowContainers(void) 
 {
     if (scroll != NULL)
     {
         gtk_widget_destroy(scroll);
         scroll = NULL;
     }
-    printf("Destroyed\n");
 }
 
-void destroyWindow()
+static void destroyWindow()
 {
     closePipes();
     gtk_main_quit();
@@ -161,13 +160,13 @@ void createStartWindow(void)
     Data->window = windowMain;
     gtk_window_set_title(GTK_WINDOW(windowMain), gameName);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
+    gtk_container_set_border_width(GTK_CONTAINER(windowMain), 0);
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(windowMain), scroll);
 
     GtkWidget *boxLMain = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(scroll), boxLMain);
-    //gtk_container_add(GTK_CONTAINER(windowMain), boxLMain);
 
     //Nick
     GtkWidget *boxLNick = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -236,6 +235,4 @@ void createStartWindow(void)
     gtk_widget_show_all(windowMain);
     gtk_widget_hide(boxLMap);
     gtk_main();
-    //gtk_widget_destroy(window);
-    //gtk_main_iteration_do(TRUE);
 }

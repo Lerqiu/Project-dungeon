@@ -23,7 +23,7 @@ typedef struct battlegroundStatic
     int X, Y;
 } BattlegroundStatic;
 
-void create_battleground(char mapPath[]);
+void create_battleground();
 void destroy_window(GtkWidget *window);
 
 typedef struct monster_data

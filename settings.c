@@ -7,7 +7,7 @@
 
 //Ustawienia ogólne
 int DEF_IMAGE_SIZE = 64;
-int maxLengthOfPath = 300;
+int maxLengthOfPath = 500;
 char folderPathImages[] = "./Images/Path/";     //koniecznie zakończona ukośnikiem
 char folderPathDynamic[] = "./Images/Dynamic/"; //koniecznie zakończona ukośnikiem
 char folderPathMaps[] = "./Maps/";              //koniecznie zakończona ukośnikiem
@@ -27,6 +27,8 @@ int defaultCharacterActionRangePx = 64 / 2;
 long long int loopTime;
 int mapRows;
 int mapColumns;
+int MainCharacterServerSearchMapIndex= 0;   //Na mapę składa się 2 graczy, przyjmowane wartości 0 lub 1
+                                            //Kolejność postaci liczona od lewego górnego rogu w prawo
 
 //Ustawienia postaci servera
 char *characterNameServer = NULL;

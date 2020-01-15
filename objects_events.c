@@ -322,7 +322,7 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
 void set_view_center_By_Character(void *ob)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)ob;
-    printf("Make view movie\n");
+    //printf("Make view movie\n");
     if ((object->objectData) == NULL)
         return;
 
@@ -333,8 +333,8 @@ void set_view_center_By_Character(void *ob)
     gdouble newY = object->posY - windowHeight / 2;
     gtk_adjustment_set_value(data->hadj, newX);
     gtk_adjustment_set_value(data->vadj, newY);
-    g_print("PosX:%f PosY:%f\n", newX, newY);
-    g_print("%f %f\n", gtk_adjustment_get_value(data->hadj), gtk_adjustment_get_value(data->vadj));
+    //g_print("PosX:%f PosY:%f\n", newX, newY);
+    //g_print("%f %f\n", gtk_adjustment_get_value(data->hadj), gtk_adjustment_get_value(data->vadj));
 }
 
 void objects_movie_up(gpointer *pointer)

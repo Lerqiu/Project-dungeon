@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+#include <time.h>
 
 #include "map_loader.h"
 #include "settings.h"
@@ -15,10 +16,10 @@ extern bool isServer;
 extern char *mapPath;
 extern bool reverseKeyBoard;
 extern char folderPathMaps[];
-extern char *mapPath;
 extern int maxLengthOfPath;
 
 extern int timeForConnectionCheck;
+extern int MainCharacterServerSearchMapIndex;
 
 //Ustawienia postaci servera
 extern char *characterNameServer;
@@ -85,87 +86,116 @@ static gboolean wait_for_start_signal_end(void)
     return FALSE;
 }
 
-static gboolean check_start_signal(void)
+char recivedData[6][2][300] = {{"Ready", "-1"},
+                               {"isServer", "-1"},
+                               {"Map", "-1"},
+                               {"Nick", "-1"},
+                               {"isKeyBoR", "-1"},
+                               {"serverCharacterIndexFoundFromMap", "-1"}};
+
+static bool checkRecivedData(void)
 {
-    char buffer[1000];
-    int size = 1000;
-    gint64 time = g_get_real_time();
-    gint64 returnTime;
 
-    while (getStringFromPipe(buffer, size) == true)
+    for (int i = 0; i < 6; i++)
     {
-
-        int a = sscanf(buffer, "Ready %li\n", &returnTime);
-        if (a == 1)
+        if (isServer)
         {
-            // printf("Poprawnie wczytany czas:%li\n", returnTime);
-            if (labs(returnTime - time) < 30 * 1000000)
+            if (!strcmp(recivedData[i][1], "-1") && (i != 2 && i != 5))
             {
-                getStringFromPipe(buffer, size);
-                //printf("%s", buffer);
-                int isServerOther;
-                sscanf(buffer, "isServer %i\n", &isServerOther);
-                int n; //= 1 ? 0 : isServer==true;
-                if (isServer == true)
-                    n = 1;
-                else
-                    n = 0;
-
-                //printf("n:%i\n", n);
-                //printf("isServerOther %i\n", isServerOther);
-                if (n != isServerOther)
-                {
-                    //printf("Poprawnie wczytano typ server/host:%i\n", isServerOther);
-                    if (isServerOther == 1)
-                    {
-                        getStringFromPipe(buffer, size);
-                        // printf("%s", buffer);
-                        char *mapOther = (char *)malloc(sizeof(char) * maxLengthOfPath);
-                        sscanf(buffer, "Map %s\n", mapOther);
-                        //printf("Map:%s\n", mapOther);
-                        mapPath = mapOther;
-                        //printf("Poprawnie wczytano mapę:%s\n", mapPath);
-                    }
-                    getStringFromPipe(buffer, size);
-                    //printf("%s", buffer);
-                    char *nickOther;
-                    sscanf(buffer, "Nick %s\n", nickOther);
-                    //printf("Nick:%s\n", nickOther);
-                    if (isServerOther == 1)
-                    {
-                        characterNameServer = nickOther;
-                    }
-                    else
-                    {
-                        characterNameHost = nickOther;
-                    }
-                    //printf("Poprawnie wczytano nick:%s\n", nickOther);
-                    getStringFromPipe(buffer, size);
-                    //printf("%s", buffer);
-                    int isKeyBoR;
-                    sscanf(buffer, "isKeyBoR %i\n", &isKeyBoR);
-                    int m; //= 1 ? 0 : reverseKeyBoard;
-                    if (reverseKeyBoard == true)
-                        m = 1;
-                    else
-                        m = 0;
-                    //printf("Poprawnie wczytano keyR:%i\n", isKeyBoR);
-                    if (m != isKeyBoR)
-                    {
-                        wait_for_start_signal_end();
-                        //gtk_main_quit();
-                        //destroyWindowSetSoft();
-                        destroyLocalWindow();
-                        gtk_main_iteration_do (FALSE);
-                        create_battleground(mapPath);
-
-                        return FALSE;
-                    }
-                }
+                return false;
             }
         }
+        else
+        {
+            if (!strcmp(recivedData[i][1], "-1"))
+            {
+                return false;
+            }
+        }
+    }
+    gint64 localTime = g_get_real_time();
+    gint64 recivedTime;
+    if (sscanf(recivedData[0][1], "%li", &recivedTime) < 1)
+        return false;
 
-        a = 0;
+    if (labs(recivedTime - localTime) / 1000000 > timeForConnectionCheck)
+        return false;
+
+    bool isServer_RecivedData;
+    char *mapPath_RecivedData;
+    bool reverseKeyBoard_RecivedData;
+    if (!strcmp("1", recivedData[1][1]))
+        isServer_RecivedData = true;
+    else
+        isServer_RecivedData = false;
+
+    if (isServer_RecivedData == isServer)
+        return false;
+
+    if (!strcmp("1", recivedData[4][1]))
+        reverseKeyBoard_RecivedData = true;
+    else
+        reverseKeyBoard_RecivedData = false;
+
+    if (reverseKeyBoard == reverseKeyBoard_RecivedData)
+        return false;
+
+    if (!isServer)
+    {
+        if (!strcmp(recivedData[2][1], "-1"))
+            return false;
+
+        mapPath = recivedData[2][1];
+        characterNameServer = recivedData[3][1];
+
+        if (!strcmp(recivedData[5][1], "-1"))
+            return false;
+
+        if (!strcmp("1", recivedData[5][1]))
+            MainCharacterServerSearchMapIndex = 1;
+        else
+            MainCharacterServerSearchMapIndex = 0;
+    }
+    else
+    {
+        characterNameHost = recivedData[3][1];
+    }
+    
+    return true;
+}
+
+static gboolean check_start_signal(void)
+{
+    int a = 0;
+    int buffer_size = 1000;
+    char buffer[buffer_size];
+
+    char data_1[maxLengthOfPath];
+    char data_2[maxLengthOfPath];
+
+    while (a < 40 && getStringFromPipe(buffer, buffer_size))
+    {
+        a++;
+
+        if (sscanf(buffer, "%s %s", data_1, data_2) < 2)
+            continue;
+
+        for (int i = 0; i < 6; i++)
+        {
+            if (!strcmp(recivedData[i][0], data_1))
+            {
+                strcpy(recivedData[i][1], data_2);
+                break;
+            }
+        }
+    }
+
+    if (checkRecivedData())
+    {
+        wait_for_start_signal_end();
+        destroyStartWindowContainers();
+        create_battleground();
+        return FALSE;
     }
 
     return TRUE;
@@ -193,52 +223,44 @@ static gboolean wait_for_start_signal(gpointer data)
 
 static void send_start_signal(char Nick[], GtkWidget *window)
 {
-    //gtk_layout_new(NULL,NULL);
     gint64 time = g_get_real_time();
 
     char buffer[maxLengthOfPath];
-    sprintf(buffer, "Ready %li\n", time);
-    //printf("%s", buffer);
+    sprintf(buffer, "%s %li\n", recivedData[0][0], time);
     sendStringToPipe(buffer);
 
     if (isServer)
     {
-        sprintf(buffer, "isServer 1\n");
+        sprintf(buffer, "%s %i\n", recivedData[1][0], 1);
     }
     else
     {
-        sprintf(buffer, "isServer 0\n");
+        sprintf(buffer, "%s %i\n", recivedData[1][0], 0);
     }
-    //printf("%s", buffer);
     sendStringToPipe(buffer);
 
     if (isServer)
     {
-        sprintf(buffer, "Map %s\n", mapPath);
-        //printf("%s", buffer);
+        sprintf(buffer, "%s %s\n", recivedData[2][0], mapPath);
+        sendStringToPipe(buffer);
+        sprintf(buffer, "%s %i\n", recivedData[5][0], MainCharacterServerSearchMapIndex);
         sendStringToPipe(buffer);
     }
 
-    sprintf(buffer, "Nick %s\n", Nick);
-    //printf("%s", buffer);
+    sprintf(buffer, "%s %s\n", recivedData[3][0], Nick);
     sendStringToPipe(buffer);
 
     if (reverseKeyBoard)
     {
-        sprintf(buffer, "isKeyBoR 1\n");
+        sprintf(buffer, "%s %i\n", recivedData[4][0], 1);
     }
     else
     {
-        sprintf(buffer, "isKeyBoR 0\n");
+        sprintf(buffer, "%s %i\n", recivedData[4][0], 0);
     }
-    //printf("%s", buffer);
-    //printf("Dane wysłane koniec\n");
     sendStringToPipe(buffer);
-    g_timeout_add(1000, wait_for_start_signal, window);
-}
 
-static void createMap()
-{
+    g_timeout_add(1000, wait_for_start_signal, window);
 }
 
 bool isCheckingPipe(void)
@@ -263,6 +285,7 @@ void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map, Gtk
     {
         characterNameServer = Nick;
         initPipes("A");
+        MainCharacterServerSearchMapIndex = rand() % 2;
     }
     else
     {
@@ -271,6 +294,4 @@ void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map, Gtk
     }
 
     send_start_signal(Nick, window);
-
-    //set_characters_index(FullName_Path_get(folderPathMaps, mapPath));
 }
