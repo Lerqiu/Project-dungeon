@@ -260,6 +260,7 @@ static void send_start_signal(char Nick[], GtkWidget *window)
     }
     sendStringToPipe(buffer);
 
+    wait_for_start_signal(window);
     g_timeout_add(1000, wait_for_start_signal, window);
 }
 

@@ -176,7 +176,7 @@ void create_battleground()
     characData->hadj = gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view));
     characData->vadj = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view));
 
-    set_view_center_By_Character((void *)mainCharacter);
+    
 
     //sterowanie postacią
     gtk_widget_add_events(windowMain, GDK_KEY_PRESS_MASK);
@@ -190,5 +190,8 @@ void create_battleground()
         g_signal_connect(G_OBJECT(windowMain), "key_press_event", G_CALLBACK(objects_movie), mainCharacter);
     }
 
+    set_view_center_By_Character((void *)mainCharacter);
+
     gtk_widget_show_all(windowMain);
+    g_timeout_add(1000/60*10,readSynchronizationEvent,NULL);
 }

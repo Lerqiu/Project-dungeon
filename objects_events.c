@@ -17,6 +17,7 @@ extern int windowWidth;
 extern BattlegroundStatic *static_objects_on_map;
 extern BattlegroundDynamic *dynamic_objects_on_map;
 extern int DEF_IMAGE_SIZE;
+extern int maxLengthOfPath;
 
 bool isCharacterOnPath(BattlegroundDynamic_element *object, int X, int Y)
 {
@@ -159,6 +160,8 @@ void characterGetKey(BattlegroundDynamic_element *object)
 
                     if (k->key_type < 4 && k->key_type >= 0)
                         ch->keyTab[k->key_type]++;
+
+                    newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "vanish");
                     gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
                     gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
                     dynamic_objects_on_map->tabOfElements[i]->image = NULL;
@@ -189,6 +192,7 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
                     GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
                     if (g->key_type == key && !g->isOpen)
                     {
+                        newSmallSynchronizationEvent(g, "open");
                         ch->keyTab[key]--;
                         g->isOpen = true;
 
@@ -217,6 +221,8 @@ bool characterStepOnTrap(BattlegroundDynamic_element *object)
                     if (!strcmp(object->type, "character"))
                     {
                         printf("You died!! funkcja:characterStepOnTrap\n");
+                        newSmallSynchronizationEvent(object, "dead");
+                        newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "launched");
                     }
 
                     return true;
@@ -244,6 +250,7 @@ bool characterSavePrinces(BattlegroundDynamic_element *object)
                     if (!strcmp(object->type, "character"))
                     {
                         printf("Princess is saved!! funkcja:characterSavePrinces\n");
+                        newSmallSynchronizationEvent(object, "princessSaved");
                     }
 
                     return true;
@@ -268,8 +275,13 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
             object->posX = object->posX + oX;
             object->posY = object->posY + oY;
             if (object->image != NULL)
-                //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
-                gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+            {
+                //gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+                char action[maxLengthOfPath];
+                sprintf(action,"move-%i-%i",object->posY,object->posX);
+                newSmallSynchronizationEvent(object, action);
+            }
+            //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
         }
         characterGetKey(object);
         for (int i = 0; i < 4; i++)
@@ -304,8 +316,11 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
                 object->posX = object->posX + oX;
                 object->posY = object->posY + oY;
                 if (object->image != NULL)
+                {
                     //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
-                    gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+                    //gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+                    newSmallSynchronizationEvent(object, "move");
+                }
             }
             else
             {
