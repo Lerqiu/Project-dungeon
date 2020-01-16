@@ -280,8 +280,9 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
                 char action[maxLengthOfPath];
                 sprintf(action,"move-%i-%i",object->posY,object->posX);
                 newSmallSynchronizationEvent(object, action);
+                gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
             }
-            //gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+            
         }
         characterGetKey(object);
         for (int i = 0; i < 4; i++)
@@ -348,6 +349,7 @@ void set_view_center_By_Character(void *ob)
     gdouble newY = object->posY - windowHeight / 2;
     gtk_adjustment_set_value(data->hadj, newX);
     gtk_adjustment_set_value(data->vadj, newY);
+    //printf("EEEEEEEEEEEEEEEEEEEE\n");
     //g_print("PosX:%f PosY:%f\n", newX, newY);
     //g_print("%f %f\n", gtk_adjustment_get_value(data->hadj), gtk_adjustment_get_value(data->vadj));
 }

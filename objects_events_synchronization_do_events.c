@@ -12,10 +12,11 @@ extern BattlegroundDynamic *dynamic_objects_on_map;
 
 void make_move_Synchronization(int indexY, int indexX, char event[])
 {
-    printf("%s\n",event);
+   
     BattlegroundDynamic_element *object = NULL;
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
+        if(dynamic_objects_on_map->tabOfElements[i]!=NULL)
         if (dynamic_objects_on_map->tabOfElements[i]->indexStartPointY == indexY && dynamic_objects_on_map->tabOfElements[i]->indexStartPointX == indexX)
         {
             object = dynamic_objects_on_map->tabOfElements[i];
@@ -26,7 +27,7 @@ void make_move_Synchronization(int indexY, int indexX, char event[])
         return;
 
     int X, Y;
-    if (sscanf(event,"move-%i-%i", &Y, &X) < 2)
+    if (sscanf(event, "move-%i-%i", &Y, &X) < 2)
         return;
 
     int x = X;
@@ -34,6 +35,7 @@ void make_move_Synchronization(int indexY, int indexX, char event[])
 
     if (object->image != NULL)
     {
-        gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+        gtk_layout_move(GTK_LAYOUT(object->layout), object->image, X, Y);
+        //printf("move-%i-%i\n",Y,X);
     }
 }

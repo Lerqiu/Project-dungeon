@@ -24,53 +24,12 @@ extern int MainCharacterServerSearchMapIndex;
 //Ustawienia postaci servera
 extern char *characterNameServer;
 extern char *characterImagePathServer;
-extern int characterServerIndexX;
-extern int characterServerIndexY;
 
 //Ustawienia postaci hosta
 extern char *characterNameHost;
 extern char *characterImagePathHost;
-extern int characterHostIndexX;
-extern int characterHostIndexY;
 extern int mapRows;
 extern int mapColumns;
-
-void set_characters_index(Prototype_map *pr_map)
-{
-    mapRows = pr_map->X;
-    mapColumns = pr_map->Y;
-
-    int tabX[2];
-    int tabY[2]; //Indexy postaci
-
-    int b = 0;
-    for (int i = 0; i < pr_map->Y; i++)
-    {
-        for (int q = 0; q < pr_map->X; q++)
-        {
-            if (!strcmp((pr_map->map + i * pr_map->X + q)->type_of_object, "ch"))
-            {
-                if (b < 2)
-                {
-                    tabX[b] = q;
-                    tabY[b] = i;
-                }
-                b++;
-            }
-        }
-    }
-
-    if (b != 2)
-    {
-        printf(u8"Error: Niepoprawny plik z mapą, błędna ilość graczy!!!\n");
-        exit(1);
-    }
-    characterServerIndexX = tabX[0];
-    characterServerIndexY = tabY[0];
-
-    characterHostIndexX = tabX[1];
-    characterHostIndexY = tabY[1];
-}
 
 int amount_of_checks; //= timeForConnectionCheck;
 GtkWidget *dialPointer = NULL;
@@ -86,6 +45,7 @@ static gboolean wait_for_start_signal_end(void)
     return FALSE;
 }
 
+int recivedDataColumns = 6;
 char recivedData[6][2][300] = {{"Ready", "-1"},
                                {"isServer", "-1"},
                                {"Map", "-1"},
@@ -93,10 +53,18 @@ char recivedData[6][2][300] = {{"Ready", "-1"},
                                {"isKeyBoR", "-1"},
                                {"serverCharacterIndexFoundFromMap", "-1"}};
 
+static void resetReciveData(void)
+{
+    for (int i = 0; i < recivedDataColumns; i++)
+    {
+        strcpy(recivedData[i][1], "-1");
+    }
+}
+
 static bool checkRecivedData(void)
 {
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < recivedDataColumns; i++)
     {
         if (isServer)
         {
@@ -119,11 +87,14 @@ static bool checkRecivedData(void)
         return false;
 
     if (labs(recivedTime - localTime) / 1000000 > timeForConnectionCheck)
+    {
+        resetReciveData();
         return false;
+    }
 
     bool isServer_RecivedData;
-    char *mapPath_RecivedData;
     bool reverseKeyBoard_RecivedData;
+
     if (!strcmp("1", recivedData[1][1]))
         isServer_RecivedData = true;
     else
@@ -145,8 +116,13 @@ static bool checkRecivedData(void)
         if (!strcmp(recivedData[2][1], "-1"))
             return false;
 
-        mapPath = recivedData[2][1];
-        characterNameServer = recivedData[3][1];
+        free(mapPath);
+        mapPath = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        strcpy(mapPath, recivedData[2][1]);
+
+        free(characterNameServer);
+        characterNameServer = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        strcpy(characterNameServer, recivedData[3][1]);
 
         if (!strcmp(recivedData[5][1], "-1"))
             return false;
@@ -158,11 +134,14 @@ static bool checkRecivedData(void)
     }
     else
     {
-        characterNameHost = recivedData[3][1];
+        free(characterNameHost);
+        characterNameHost = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        strcpy(characterNameHost, recivedData[3][1]);
     }
-    
+
     return true;
 }
+bool isReady = false;
 
 static gboolean check_start_signal(void)
 {
@@ -180,7 +159,7 @@ static gboolean check_start_signal(void)
         if (sscanf(buffer, "%s %s", data_1, data_2) < 2)
             continue;
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < recivedDataColumns; i++)
         {
             if (!strcmp(recivedData[i][0], data_1))
             {
@@ -192,9 +171,15 @@ static gboolean check_start_signal(void)
 
     if (checkRecivedData())
     {
+
         wait_for_start_signal_end();
         destroyStartWindowContainers();
-        create_battleground();
+        if (!isReady)
+        {
+            isReady = true;
+            create_battleground();
+        }
+
         return FALSE;
     }
 

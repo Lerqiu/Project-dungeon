@@ -5,6 +5,5 @@
 
 void set_connection(char *Nick, bool isServerr, bool isKeyRevert, char *Map,GtkWidget *window);
 bool isCheckingPipe(void);
-void set_characters_index(Prototype_map *pr_map);
 
 #endif

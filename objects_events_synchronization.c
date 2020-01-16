@@ -23,13 +23,14 @@ void newSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char e
 }
 
 void newSmallSynchronizationEvent(void *el, char event[])
-{   BattlegroundDynamic_element *element=(BattlegroundDynamic_element *)el;
+{
+    BattlegroundDynamic_element *element = (BattlegroundDynamic_element *)el;
     char typeOfObject[maxLengthOfPath];
     strcpy(typeOfObject, element->type);
-    int indexY=element->indexStartPointY;
-    int indexX=element->indexStartPointX;
+    int indexY = element->indexStartPointY;
+    int indexX = element->indexStartPointX;
 
-    newSynchronizationEvent(typeOfObject,indexY,indexX,event);
+    newSynchronizationEvent(typeOfObject, indexY, indexX, event);
 }
 
 gboolean readSynchronizationEvent(gpointer data)
@@ -49,21 +50,26 @@ gboolean readSynchronizationEvent(gpointer data)
     recivedSynchronizationEvent(typeOfObject, indexY, indexX, event);
 
     //printf("Synchronization: OType:%s IY:%i IX:%i Event:%s\n",typeOfObject,indexY,indexX,event);
+    readSynchronizationEvent(NULL);
     return TRUE;
 }
 
 void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[])
 {
 
-    //printf("Synchronization ObjType:%s IY:%i IX:%i Event:%s\n", typeOfObject, indexX, indexY, event);
-    if(!strcmp("character",typeOfObject) || !strcmp("monster",typeOfObject) ){
-        if(strlen(event)<4)
+    //printf("Recive Synchronization ObjType:%s IY:%i IX:%i Event:%s\n", typeOfObject, indexX, indexY, event);
+    if (!strcmp("character", typeOfObject) || !strcmp("monster", typeOfObject))
+    {
+        if (strlen(event) < 4)
             return;
         char action[maxLengthOfPath];
-        memcpy(action,event,4);
-        if(!strcmp(action,"move")){
-            make_move_Synchronization(indexY,indexX,event);
+        memcpy(action, event, 4);
+        action[4] = '\0';
+        //printf("momo:%s\n", action);
+        if (!strcmp(action, "move"))
+        {
+            //printf("redy for movie\n");
+            make_move_Synchronization(indexY, indexX, event);
         }
     }
-
 }

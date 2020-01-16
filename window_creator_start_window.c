@@ -85,6 +85,8 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
     char *Map = NULL;
 
     CheckCorrectData_Struct *checkStructData = (CheckCorrectData_Struct *)data;
+    if (checkStructData->entryNick == NULL)
+        return;
     const gchar *n = gtk_entry_get_text(GTK_ENTRY(checkStructData->entryNick));
     Nick = (char *)malloc(sizeof(char) * (strlen(n) + 1));
     strcpy(Nick, n);
@@ -94,7 +96,7 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
         showError("Za krótki nick (minimum 3 znaki)", checkStructData);
         return;
     }
-    for (int i = 0; i < strlen(Nick); i++)
+    for (int i = 0; i < (int)(strlen(Nick)); i++)
     {
         if (Nick[i] == ' ' || Nick[i] == '\t')
         {
@@ -136,13 +138,17 @@ static void checkCorrectData(GtkWidget *PlayButton, gpointer data)
     set_connection(Nick, isServer, isKeyRevert, Map, checkStructData->window);
 }
 
-static GtkWidget *scroll = NULL;
-void destroyStartWindowContainers(void) 
+GtkWidget *windowMain = NULL;
+static GtkWidget *scrollWindowWidget = NULL;
+
+void destroyStartWindowContainers(void)
 {
-    if (scroll != NULL)
+    if (scrollWindowWidget != NULL)
     {
-        gtk_widget_destroy(scroll);
-        scroll = NULL;
+        gtk_container_remove(GTK_CONTAINER(windowMain), scrollWindowWidget);
+        if (GTK_IS_WIDGET(scrollWindowWidget))
+            gtk_widget_destroy(scrollWindowWidget);
+        scrollWindowWidget = NULL;
     }
 }
 
@@ -151,7 +157,7 @@ static void destroyWindow()
     closePipes();
     gtk_main_quit();
 }
-GtkWidget *windowMain = NULL;
+
 void createStartWindow(void)
 {
     CheckCorrectData_Struct *Data = (CheckCorrectData_Struct *)malloc(sizeof(CheckCorrectData_Struct));
@@ -162,11 +168,11 @@ void createStartWindow(void)
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
     gtk_container_set_border_width(GTK_CONTAINER(windowMain), 0);
 
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(windowMain), scroll);
+    scrollWindowWidget = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(windowMain), scrollWindowWidget);
 
     GtkWidget *boxLMain = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_container_add(GTK_CONTAINER(scroll), boxLMain);
+    gtk_container_add(GTK_CONTAINER(scrollWindowWidget), boxLMain);
 
     //Nick
     GtkWidget *boxLNick = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);

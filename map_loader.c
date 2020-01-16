@@ -15,12 +15,12 @@ extern int defaultMonsterSpeed;
 extern int defaultCharacterSpeed;
 extern int defaultCharacterActionRangePx;
 
+/*
 static void print_prototype_map(Prototype_map *pr_map)
 {
     if (pr_map == NULL)
         return;
 
-    int b = 0;
     for (int i = 0; i < pr_map->Y; i++)
     {
         for (int q = 0; q < pr_map->X; q++)
@@ -29,7 +29,7 @@ static void print_prototype_map(Prototype_map *pr_map)
         }
         putchar('\n');
     }
-}
+}*/
 
 Prototype_map *prototype_load_map(char name[])
 {
@@ -56,7 +56,7 @@ Prototype_map *prototype_load_map(char name[])
     {
         char buffor_temporary[100];
         int index_of_buffer = 0;
-        while (index_of_buffer < strlen(buffer) && buffer[index_of_buffer] != ':' && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
+        while (index_of_buffer < (int)(strlen(buffer)) && buffer[index_of_buffer] != ':' && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
         {
             buffor_temporary[index_of_buffer] = buffer[index_of_buffer];
             index_of_buffer++;
@@ -69,7 +69,7 @@ Prototype_map *prototype_load_map(char name[])
 
         strcpy(buffor_temporary, "");
         int index_of_buffor_temporary = 0;
-        while (index_of_buffer < strlen(buffer) && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
+        while (index_of_buffer < (int)(strlen(buffer)) && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
         {
             buffor_temporary[index_of_buffor_temporary] = buffer[index_of_buffer];
             index_of_buffer++;
@@ -262,7 +262,7 @@ void path_add_corner(int x, int y, Prototype_map *pr_map, BattlegroundStatic_ele
 
 void map_create_path(int x, int y, Prototype_map *pr_map, BattlegroundStatic_element *element)
 {
-    bool top = false, right = false, bootom = false, left = false, leftBottom = false, rightBottom = true;
+    bool top = false, right = false, bootom = false, left = false;
     check_walls(x, y, pr_map, &top, &right, &bootom, &left);
 
     x *= DEF_IMAGE_SIZE;

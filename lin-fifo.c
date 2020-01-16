@@ -17,7 +17,6 @@ struct pipes
 #define MAKS_DL_TEKSTU 10000
 
 static PipesPtr potoki = NULL;
-static char *moj_id, *twoj_id;
 
 int fileno(FILE *file);
 static FILE *openOutPipe(char *name);
@@ -114,6 +113,8 @@ bool getStringFromPipe(char *buffer, size_t size)
     fflush(pipes->fifo_in);
 
     //printf("Tekst odebrany: %s", buffer);
+    //if(strlen(buffer)<1)
+    // putchar('\n');
 
     return result != NULL;
 }
