@@ -50,14 +50,12 @@ gboolean readSynchronizationEvent(gpointer data)
     recivedSynchronizationEvent(typeOfObject, indexY, indexX, event);
 
     //printf("Synchronization: OType:%s IY:%i IX:%i Event:%s\n",typeOfObject,indexY,indexX,event);
-    readSynchronizationEvent(NULL);
+    readSynchronizationEvent(NULL); //Wymagane by zachować płynność gry
     return TRUE;
 }
 
 void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[])
 {
-
-    //printf("Recive Synchronization ObjType:%s IY:%i IX:%i Event:%s\n", typeOfObject, indexX, indexY, event);
     if (!strcmp("character", typeOfObject) || !strcmp("monster", typeOfObject))
     {
         if (strlen(event) < 4)
@@ -69,7 +67,21 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
         if (!strcmp(action, "move"))
         {
             //printf("redy for movie\n");
-            make_move_Synchronization(indexY, indexX, event);
+            make_move_Synchronization(getObject_by_ids(indexY, indexX), event);
+        }
+    }
+    else if (!strcmp("gate", typeOfObject))
+    {
+        if (!strcmp("open", event))
+        {
+            open_gate_Synchronization(getObject_by_ids(indexY, indexX), event);
+        }
+    }
+    else if (!strcmp("key", typeOfObject))
+    {
+        if (!strcmp("vanish", event))
+        {
+            key_vanish_Synchronization(getObject_by_ids(indexY, indexX), event);
         }
     }
 }

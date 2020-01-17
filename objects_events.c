@@ -162,12 +162,14 @@ void characterGetKey(BattlegroundDynamic_element *object)
                         ch->keyTab[k->key_type]++;
 
                     newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "vanish");
+                    /*
                     gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
                     gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
                     dynamic_objects_on_map->tabOfElements[i]->image = NULL;
 
                     free(dynamic_objects_on_map->tabOfElements[i]);
                     dynamic_objects_on_map->tabOfElements[i] = NULL;
+                    */
                 }
             }
     }
@@ -192,8 +194,11 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
                     GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
                     if (g->key_type == key && !g->isOpen)
                     {
-                        newSmallSynchronizationEvent(g, "open");
                         ch->keyTab[key]--;
+                        newSmallSynchronizationEvent( dynamic_objects_on_map->tabOfElements[i], "open");
+                        return;
+                        /*
+                       
                         g->isOpen = true;
 
                         gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
@@ -202,6 +207,7 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
 
                         free(dynamic_objects_on_map->tabOfElements[i]);
                         dynamic_objects_on_map->tabOfElements[i] = NULL;
+                        */
                     }
                 }
             }
@@ -278,11 +284,10 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
             {
                 //gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
                 char action[maxLengthOfPath];
-                sprintf(action,"move-%i-%i",object->posY,object->posX);
+                sprintf(action, "move-%i-%i", object->posY, object->posX);
                 newSmallSynchronizationEvent(object, action);
                 gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
             }
-            
         }
         characterGetKey(object);
         for (int i = 0; i < 4; i++)
