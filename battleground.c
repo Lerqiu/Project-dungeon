@@ -54,7 +54,7 @@ static void create_battleground_static(GtkWidget *window, Prototype_map *pr_map,
         for (int q = 0; q < pr_map->X; q++)
         {
             if ((static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage != NULL)
-                gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+                gtk_fixed_put(GTK_FIXED(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->downimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
         }
     }
 }
@@ -67,7 +67,7 @@ static void create_battleground__static_top(GtkWidget *window, Prototype_map *pr
         for (int q = 0; q < pr_map->X; q++)
         {
             if ((static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage != NULL)
-                gtk_layout_put(GTK_LAYOUT(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
+                gtk_fixed_put(GTK_FIXED(lay), (static_objects_on_map->map)[i * static_objects_on_map->X + q]->topimage, static_objects_on_map->map[i * static_objects_on_map->X + q]->posX, static_objects_on_map->map[i * static_objects_on_map->X + q]->posY);
         }
     }
 }
@@ -141,8 +141,8 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
     {
         if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
         {
-            gtk_layout_put(GTK_LAYOUT(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
-            //gtk_layout_put(gtk_layout(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
+            gtk_fixed_put(GTK_FIXED(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
+            //gtk_fixed_put(gtk_fixed(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
             dynamic_objects_on_map->tabOfElements[a]->layout = lay;
         }
     }
@@ -166,17 +166,25 @@ void create_battleground()
 
     GtkAdjustment *hadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
     GtkAdjustment *vadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
-    GtkWidget *view = gtk_viewport_new(hadjCharacter, vadjCharacter);
 
-    
-    GtkWidget *lay = gtk_layout_new(hadjCharacter, vadjCharacter);
+    /*
+    GtkWidget *lay = gtk_fixed_new(hadjCharacter, vadjCharacter);
     gtk_container_add(GTK_CONTAINER(windowMain), lay);
+    */
     Prototype_map *pr_map = prototype_load_map(mapPath);
+    
+    GtkWidget *lay = gtk_fixed_new();
+    GtkWidget *view = gtk_viewport_new(hadjCharacter, vadjCharacter);
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+
+    gtk_container_add(GTK_CONTAINER(view), lay);
+    gtk_container_add(GTK_CONTAINER(scroll), view);
+    gtk_container_add(GTK_CONTAINER(windowMain), scroll);
 
     create_battleground_static(windowMain, pr_map, lay);
 
     create_battleground_dynamic(windowMain, pr_map, lay);
-    
+
     create_battleground__static_top(windowMain, pr_map, lay);
 
     CharacterData *characData = (CharacterData *)(mainCharacter->objectData);

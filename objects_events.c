@@ -286,7 +286,7 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
                 char action[maxLengthOfPath];
                 sprintf(action, "move-%i-%i", object->posY, object->posX);
                 newSmallSynchronizationEvent(object, action);
-                gtk_layout_move(GTK_LAYOUT(object->layout), object->image, object->posX, object->posY);
+                gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
             }
         }
         characterGetKey(object);

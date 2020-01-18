@@ -49,7 +49,7 @@ void make_move_Synchronization(Pointer_and_Index *poi, char event[])
 
     if (object->image != NULL)
     {
-        gtk_layout_move(GTK_LAYOUT(object->layout), object->image, X, Y);
+        gtk_fixed_move(GTK_FIXED(object->layout), object->image, X, Y);
         //printf("move-%i-%i\n",Y,X);
     }
     free(poi);
