@@ -225,17 +225,17 @@ void path_add_corner(int x, int y, Prototype_map *pr_map, BattlegroundStatic_ele
         {
             if (leftBottom == true && rightBottom == true && *left == false && *right == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_right_left_bottom_corner_b.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_right_left_bottom_corner_b.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
             else if (leftBottom == true && *left == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_left_bottom_corner_b.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_left_bottom_corner_b.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
             else if (rightBottom == true && *right == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_right_bottom_corner_b.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_right_bottom_corner_b.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
         }
@@ -243,17 +243,17 @@ void path_add_corner(int x, int y, Prototype_map *pr_map, BattlegroundStatic_ele
         {
             if (leftBottom == true && rightBottom == true && *left == false && *right == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_right_left_bottom_corner.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_right_left_bottom_corner.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
             else if (leftBottom == true && *left == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_left_bottom_corner.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_left_bottom_corner.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
             else if (rightBottom == true && *right == false)
             {
-                sprintf(pathToFile, "%s%s", folderPathImages, "patch_right_bottom_corner.png");
+                sprintf(pathToFile, "%s%s", folderPathImages, "path_right_bottom_corner.png");
                 element->topimage = gtk_image_new_from_file(pathToFile);
             }
         }
