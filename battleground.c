@@ -116,6 +116,7 @@ static void create_character(BattlegroundDynamic *map)
         characterHostIndexX = character[MainCharacterServerSearchMapIndex]->indexStartPointX;
         characterHostIndexY = character[MainCharacterServerSearchMapIndex]->indexStartPointY;
     }
+
 }
 
 static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
@@ -135,14 +136,12 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
                 a++;
         }
     }
-
     create_character(dynamic_objects_on_map);
     for (int a = 0; a < dynamic_objects_on_map->amount; a++)
     {
         if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
         {
             gtk_fixed_put(GTK_FIXED(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
-            //gtk_fixed_put(gtk_fixed(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
             dynamic_objects_on_map->tabOfElements[a]->layout = lay;
         }
     }
@@ -182,6 +181,7 @@ void changeBackgroundCollor(GtkWidget *window)
     gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssP),
                                     "window {  \n"
                                     "   background-color: #201d20;    \n"
+                                    //"   background-color: red;    \n"
                                     "} \n",
                                     -1, NULL);
     g_object_unref(cssP);
