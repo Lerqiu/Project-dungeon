@@ -148,13 +148,52 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
     }
 }
 
-extern GtkWidget *windowMain;
+GtkWidget *labelsTabRightPanel[4];
+void createRightPanel(GtkWidget *MainBox)
+{
+    GtkWidget *MRBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_hexpand(MRBox, FALSE);
+    gtk_container_add(GTK_CONTAINER(MainBox), MRBox);
 
+    char rightPanelTabChar[4][2][500] = {
+        {"Images/Dynamic/key.png", "0"},
+        {"Images/Dynamic/key.png", "0"},
+        {"Images/Dynamic/key.png", "0"},
+        {"Images/Dynamic/key.png", "0"}};
+
+    for (int i = 0; i < 4; i++)
+    {
+        GtkWidget *boxK = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+        GtkWidget *imageK = gtk_image_new_from_file(rightPanelTabChar[i][0]);
+        labelsTabRightPanel[i] = gtk_label_new(rightPanelTabChar[i][1]);
+        gtk_container_add(GTK_CONTAINER(boxK), imageK);
+        gtk_container_add(GTK_CONTAINER(boxK), labelsTabRightPanel[i]);
+        gtk_container_add(GTK_CONTAINER(MRBox), boxK);
+    }
+}
+
+void changeBackgroundCollor(GtkWidget *window)
+{
+    GtkCssProvider *cssP = gtk_css_provider_new();
+    GdkDisplay *dis = gdk_display_get_default();
+    GdkScreen *scr = gdk_display_get_default_screen(dis);
+
+    gtk_style_context_add_provider_for_screen(scr, GTK_STYLE_PROVIDER(cssP), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssP),
+                                    "window {  \n"
+                                    "   background-color: #201d20;    \n"
+                                    "} \n",
+                                    -1, NULL);
+    g_object_unref(cssP);
+}
+
+extern GtkWidget *windowMain;
 void create_battleground()
 {
     gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
     gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
+    changeBackgroundCollor(windowMain);
 
     char *name;
     if (isServer == true)
@@ -172,14 +211,21 @@ void create_battleground()
     gtk_container_add(GTK_CONTAINER(windowMain), lay);
     */
     Prototype_map *pr_map = prototype_load_map(mapPath);
-    
+
     GtkWidget *lay = gtk_fixed_new();
     GtkWidget *view = gtk_viewport_new(hadjCharacter, vadjCharacter);
+    GtkWidget *mainBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
 
     gtk_container_add(GTK_CONTAINER(view), lay);
     gtk_container_add(GTK_CONTAINER(scroll), view);
-    gtk_container_add(GTK_CONTAINER(windowMain), scroll);
+    gtk_container_add(GTK_CONTAINER(mainBox), scroll);
+    gtk_widget_set_hexpand(scroll, TRUE);
+    gtk_widget_hide(gtk_scrolled_window_get_vscrollbar(GTK_SCROLLED_WINDOW(scroll)));
+    gtk_widget_hide(gtk_scrolled_window_get_hscrollbar(GTK_SCROLLED_WINDOW(scroll)));
+
+    createRightPanel(mainBox);
+    gtk_container_add(GTK_CONTAINER(windowMain), mainBox);
 
     create_battleground_static(windowMain, pr_map, lay);
 
