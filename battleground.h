@@ -30,6 +30,8 @@ typedef struct monster_data
 {
     int direction;
     int amountsOfSteps;
+    int endIndexX;
+    int endIndexY;
 
 } MonsterData;
 

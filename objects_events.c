@@ -148,6 +148,9 @@ bool characterColisionGate(BattlegroundDynamic_element *object, int oX, int oY)
 
 void characterGetKey(BattlegroundDynamic_element *object)
 {
+    if (object == NULL)
+        return;
+
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
         if (dynamic_objects_on_map->tabOfElements[i] != NULL)
@@ -168,6 +171,7 @@ void characterGetKey(BattlegroundDynamic_element *object)
                         gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[k->key_type]), buffer);
 
                         newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "vanish");
+                        return;
                     }
 
                     /*
@@ -185,6 +189,12 @@ void characterGetKey(BattlegroundDynamic_element *object)
 
 void characterKeyUse(BattlegroundDynamic_element *object, int key)
 {
+    printf("Open gate\n");
+    if (object == NULL)
+        return;
+    if (object->objectData==NULL)
+        return;
+
     CharacterData *ch = (CharacterData *)object->objectData;
     if (key >= 4 || key < 0)
         return;
@@ -193,39 +203,31 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
 
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
     {
-        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
-            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
+        if (dynamic_objects_on_map->tabOfElements[i] == NULL)
+            continue;
+        printf("Type: %s\n", dynamic_objects_on_map->tabOfElements[i]->type);
+        if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "gate"))
+        {
+            printf("Open gate found\n");
+
+            if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
             {
-
-                if (isCharacterInRangeOfAction(object, dynamic_objects_on_map->tabOfElements[i]))
+                if (dynamic_objects_on_map->tabOfElements[i] == NULL)
+                    continue;
+                GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                if (g->key_type == key && !g->isOpen)
                 {
-                    if(dynamic_objects_on_map->tabOfElements[i]==NULL)
-                        continue;
-                    GateData *g = (GateData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
-                    if (g->key_type == key && !g->isOpen)
-                    {
-                        ch->keyTab[key]--;
-                        extern GtkWidget *labelsTabRightPanel[4];
-                        char buffer[100];
-                        sprintf(buffer, "%i", ch->keyTab[key]);
-                        gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[key]), buffer);
+                    ch->keyTab[key]--;
+                    extern GtkWidget *labelsTabRightPanel[4];
+                    char buffer[100];
+                    sprintf(buffer, "%i", ch->keyTab[key]);
+                    gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[key]), buffer);
 
-                        newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "open");
-                        return;
-                        /*
-                       
-                        g->isOpen = true;
-
-                        gtk_image_clear(GTK_IMAGE(dynamic_objects_on_map->tabOfElements[i]->image));
-                        gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
-                        dynamic_objects_on_map->tabOfElements[i]->image = NULL;
-
-                        free(dynamic_objects_on_map->tabOfElements[i]);
-                        dynamic_objects_on_map->tabOfElements[i] = NULL;
-                        */
-                    }
+                    newSmallSynchronizationEvent(dynamic_objects_on_map->tabOfElements[i], "open");
+                    return;
                 }
             }
+        }
     }
 }
 

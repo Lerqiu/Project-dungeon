@@ -1,1 +1,11 @@
-0 0
+10 10
+w w w w n n n w w w
+w k:0 p w w w n w k:0 k:3 
+n w p p p w w w p k:1 
+n w p w p w t p p k:2 
+w p p w ch w ch p p w 
+w g:0 w w w w w w p w 
+w p w m:2 p p p p p w 
+w p g:0 g:1 g:2 g:3 w w p w 
+w e p p p p p p p w 
+w w w w w w w w w w 

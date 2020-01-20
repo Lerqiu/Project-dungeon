@@ -115,12 +115,13 @@ static bool checkRecivedData(void)
     {
         if (!strcmp(recivedData[2][1], "-1"))
             return false;
-
-        free(mapPath);
+        if (mapPath != NULL)
+            free(mapPath);
         mapPath = (char *)malloc(sizeof(char) * maxLengthOfPath);
         strcpy(mapPath, recivedData[2][1]);
 
-        free(characterNameServer);
+        if (mapPath != NULL)
+            free(characterNameServer);
         characterNameServer = (char *)malloc(sizeof(char) * maxLengthOfPath);
         strcpy(characterNameServer, recivedData[3][1]);
 
@@ -134,7 +135,8 @@ static bool checkRecivedData(void)
     }
     else
     {
-        free(characterNameHost);
+        if (characterNameHost != NULL)
+            free(characterNameHost);
         characterNameHost = (char *)malloc(sizeof(char) * maxLengthOfPath);
         strcpy(characterNameHost, recivedData[3][1]);
     }

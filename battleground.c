@@ -155,10 +155,10 @@ void createRightPanel(GtkWidget *MainBox)
     gtk_container_add(GTK_CONTAINER(MainBox), MRBox);
 
     char rightPanelTabChar[4][2][500] = {
-        {"Images/Dynamic/key.png", "0"},
-        {"Images/Dynamic/key.png", "0"},
-        {"Images/Dynamic/key.png", "0"},
-        {"Images/Dynamic/key.png", "0"}};
+        {"Images/Dynamic/key_0.png", "0"},
+        {"Images/Dynamic/key_1.png", "0"},
+        {"Images/Dynamic/key_2.png", "0"},
+        {"Images/Dynamic/key_3.png", "0"}};
 
     for (int i = 0; i < 4; i++)
     {

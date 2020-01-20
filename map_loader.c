@@ -388,13 +388,7 @@ BattlegroundStatic_element *load_battleground_static(Prototype_map_element *prot
 
 void map_create_std_dynamic(int x, int y, BattlegroundDynamic_element *element, char type[])
 {
-    char pathToFile[maxLengthOfPath];
-    sprintf(pathToFile, "%s%s%s", folderPathDynamic, type, ".png");
-
-    if (strcmp(type, "character"))
-        element->image = gtk_image_new_from_file(pathToFile);
-    else
-        element->image = NULL;
+    element->image = NULL;
     element->height = DEF_IMAGE_SIZE;
     element->width = DEF_IMAGE_SIZE;
     element->posX = x * DEF_IMAGE_SIZE;
@@ -424,6 +418,9 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
     if (!strcmp(prototype_element->type_of_object, "e"))
     {
         map_create_std_dynamic(x, y, element, "princess");
+        char pathToFile[maxLengthOfPath];
+        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "princess", ".png");
+        element->image = gtk_image_new_from_file(pathToFile);
     }
     else if (!strcmp(prototype_element->type_of_object, "ch"))
     {
@@ -432,31 +429,38 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         element->colisionCheckY = DEF_IMAGE_SIZE / 4;
         element->colisionCheckX = DEF_IMAGE_SIZE / 4;
         element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
-        element->actionRange=defaultCharacterActionRangePx;
+        element->actionRange = defaultCharacterActionRangePx;
 
         CharacterData *data = (CharacterData *)malloc(sizeof(CharacterData));
-            data->hadj = NULL;
-            data->vadj = NULL;
-            for(int i=0;i<4;i++)
-            data->keyTab[i]=0;
-        element->objectData=(void*)data;
+        data->hadj = NULL;
+        data->vadj = NULL;
+        for (int i = 0; i < 4; i++)
+            data->keyTab[i] = 0;
+        element->objectData = (void *)data;
     }
     else if (!strcmp(prototype_element->type_of_object, "g"))
     {
         map_create_std_dynamic(x, y, element, "gate");
-        GateData *data=(GateData*)malloc(sizeof(GateData));
-        data->isOpen=false;
-        data->key_type=prototype_element->v1;
-        if(data->key_type<0)
-            {
-                printf(u8"Error: Niepodano typu klucza otwierającego bramę Y:%i X:%i, błędna mapa!!!\n",y,x);
-                exit(1);
-            }
-        element->objectData=(void*)data;
+        GateData *data = (GateData *)malloc(sizeof(GateData));
+        data->isOpen = false;
+        data->key_type = prototype_element->v1;
+        if (data->key_type < 0 || data->key_type > 3)
+        {
+            printf(u8"Error: Niepodano typu klucza otwierającego bramę Y:%i X:%i, błędna mapa!!!\n", y, x);
+            exit(1);
+        }
+        char pathToFile[maxLengthOfPath];
+        sprintf(pathToFile, "%s%s%i%s", folderPathDynamic, "gate_", data->key_type, ".png");
+        element->image = gtk_image_new_from_file(pathToFile);
+
+        element->objectData = (void *)data;
     }
     else if (!strcmp(prototype_element->type_of_object, "t"))
     {
         map_create_std_dynamic(x, y, element, "trap");
+        char pathToFile[maxLengthOfPath];
+        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "trap", ".png");
+        element->image = gtk_image_new_from_file(pathToFile);
     }
     else if (!strcmp(prototype_element->type_of_object, "m"))
     {
@@ -466,31 +470,51 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         element->colisionCheckX = DEF_IMAGE_SIZE / 4;
         element->pivotPosY = element->height - DEF_IMAGE_SIZE / 4;
 
-        MonsterData *m = (MonsterData*)malloc(sizeof(MonsterData));
-        m->direction=prototype_element->v1;
-        m->amountsOfSteps=prototype_element->v2;
+        MonsterData *m = (MonsterData *)malloc(sizeof(MonsterData));
+        m->direction = prototype_element->v1;
+        m->amountsOfSteps = prototype_element->v2;
+        m->endIndexX = element->indexStartPointX;
+        m->endIndexY = element->indexStartPointY;
+        if (m->amountsOfSteps > 0)
+        {
+            if (m->direction == 0)
+                m->endIndexY -= m->amountsOfSteps;
+            if (m->direction == 1)
+                m->endIndexX += m->amountsOfSteps;
+            if (m->direction == 2)
+                m->endIndexY += m->amountsOfSteps;
+            if (m->direction == 3)
+                m->endIndexX -= m->amountsOfSteps;
+        }
 
-        element->objectData=(void*)m;
+        char pathToFile[maxLengthOfPath];
+        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "monster", ".png");
+        element->image = gtk_image_new_from_file(pathToFile);
+
+        element->objectData = (void *)m;
     }
     else if (!strcmp(prototype_element->type_of_object, "k"))
     {
         map_create_std_dynamic(x, y, element, "key");
-        KeyData *k=(KeyData*)malloc(sizeof(KeyData));
-        k->key_type=prototype_element->v1;
+        KeyData *k = (KeyData *)malloc(sizeof(KeyData));
+        k->key_type = prototype_element->v1;
+        if (k->key_type < 0 || k->key_type > 3)
+        {
+            printf(u8"Error: Niepodano typu klucza Y:%i X:%i, błędna mapa!!!\n", y, x);
+            exit(1);
+        }
         char pathToFile[maxLengthOfPath];
-        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "key_s", ".png");
-        k->smalImagePath=(char*)malloc(sizeof(char)*(strlen(pathToFile)+1));
-        strcpy(k->smalImagePath,pathToFile);
-         if(k->key_type<0)
-            {
-                printf(u8"Error: Niepodano typu klucza Y:%i X:%i, błędna mapa!!!\n",y,x);
-                exit(1);
-            }
-        element->objectData=(void*)k;
+        sprintf(pathToFile, "%s%s%i%s", folderPathDynamic, "key_", k->key_type, ".png");
+        k->smalImagePath = (char *)malloc(sizeof(char) * (strlen(pathToFile) + 1));
+        strcpy(k->smalImagePath, pathToFile);
+        element->image = gtk_image_new_from_file(pathToFile);
+
+        element->objectData = (void *)k;
     }
     else
     {
-        free(element);
+        if (element != NULL)
+            free(element);
         element = NULL;
     }
 
