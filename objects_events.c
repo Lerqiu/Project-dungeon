@@ -192,7 +192,7 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
     printf("Open gate\n");
     if (object == NULL)
         return;
-    if (object->objectData==NULL)
+    if (object->objectData == NULL)
         return;
 
     CharacterData *ch = (CharacterData *)object->objectData;
