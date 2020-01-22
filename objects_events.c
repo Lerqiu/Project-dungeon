@@ -292,7 +292,7 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
     int x = object->posX + oX + object->pivotPosX;
     int y = object->posY + oY + object->pivotPosY;
 
-    if (!strcmp(object->type, "character"))
+    if (!strcmp(object->type, "character") || !strcmp(object->type, "monster"))
     {
         if (isCharacterOnPath(object, x, y) == false && characterColisionGate(object, x, y) == false)
         {
@@ -307,53 +307,70 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
                 gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
             }
         }
-        characterGetKey(object);
-        // for (int i = 0; i < 4; i++)
-        // characterKeyUse(object, i);
-
-        characterStepOnTrap(object);
-        characterSavePrinces(object);
-    }
-    else
-    {
-        if (strcmp(object->type, "monster"))
-            return;
-        if (isCharacterOnPath(object, x, y) == false)
+        else
         {
-            bool colision = false;
-
-            for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+            if (!strcmp(object->type, "monster"))
             {
-                if (dynamic_objects_on_map->tabOfElements[i] != NULL)
-                    if (strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "character"))
-                    {
-                        if (isColisionDynamic(object, dynamic_objects_on_map->tabOfElements[i]))
-                        {
-                            colision = true;
-                            break;
-                        }
-                    }
-            }
-
-            if (colision == false)
-            {
-                object->posX = object->posX + oX;
-                object->posY = object->posY + oY;
-                if (object->image != NULL)
-                {
-                    newSmallSynchronizationEvent(object, "move");
-                }
-            }
-            else
-            {
-
-                MonsterData *m = (MonsterData *)object->objectData;
-                m->direction -= 2;
-                if (m->direction < 0)
-                    m->direction = 4 + m->direction;
+                MonsterData *mData = (MonsterData *)object->objectData;
+                mData->isColision = true;
             }
         }
+
+        if (!strcmp(object->type, "character"))
+        {
+            characterGetKey(object);
+
+            characterStepOnTrap(object);
+            characterSavePrinces(object);
+        }
     }
+}
+
+gboolean monster_move(gpointer data)
+{
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "monster"))
+            {
+                if (dynamic_objects_on_map->tabOfElements[i]->objectData == NULL)
+                    continue;
+
+                MonsterData *mData = (MonsterData *)dynamic_objects_on_map->tabOfElements[i]->objectData;
+                int oX = 0, oY = 0;
+
+                if (mData->isColision == true)
+                {
+                    if(mData->direction==0)
+                        mData->direction=2;
+                    else if(mData->direction==1)
+                        mData->direction=3;
+                    else if(mData->direction==2)
+                        mData->direction=0;
+                    else if(mData->direction==3)
+                        mData->direction=1;
+                    mData->isColision = false;
+                }
+
+
+                if (mData->direction == 1)
+                    oX += defaultMonsterSpeed;
+                else if (mData->direction == 3)
+                    oX -= defaultMonsterSpeed;
+
+                if (mData->direction == 2)
+                    oY += defaultMonsterSpeed;
+                else if (mData->direction == 0)
+                    oY -= defaultMonsterSpeed;
+
+                //oX/=60;
+                //oY/=60;
+
+                make_move(dynamic_objects_on_map->tabOfElements[i], oX, oY);
+            }
+    }
+   // printf("Works???\n");
+    return TRUE;
 }
 
 void set_view_center_By_Character(void *ob)

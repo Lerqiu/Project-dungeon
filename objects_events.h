@@ -28,5 +28,6 @@ Pointer_and_Index *getObject_by_ids(int indexY, int intexX);
 void make_move_Synchronization(Pointer_and_Index *object, char event[]);
 void open_gate_Synchronization(Pointer_and_Index *object, char event[]);
 void key_vanish_Synchronization(Pointer_and_Index *poi, char event[]);
+gboolean monster_move(gpointer data);
 
 #endif

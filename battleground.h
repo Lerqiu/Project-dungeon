@@ -32,6 +32,7 @@ typedef struct monster_data
     int amountsOfSteps;
     int endIndexX;
     int endIndexY;
+    bool isColision;
 
 } MonsterData;
 

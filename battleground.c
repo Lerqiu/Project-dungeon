@@ -116,14 +116,13 @@ static void create_character(BattlegroundDynamic *map)
         characterHostIndexX = character[MainCharacterServerSearchMapIndex]->indexStartPointX;
         characterHostIndexY = character[MainCharacterServerSearchMapIndex]->indexStartPointY;
     }
-
 }
 
 static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
 {
     dynamic_objects_on_map = (BattlegroundDynamic *)malloc(sizeof(BattlegroundDynamic));
     dynamic_objects_on_map->amount = amount_of_dynamic_elements(pr_map);
-    dynamic_objects_on_map->tabOfElements = (BattlegroundDynamic_element **)malloc(sizeof(BattlegroundDynamic_element *) * (1+dynamic_objects_on_map->amount));
+    dynamic_objects_on_map->tabOfElements = (BattlegroundDynamic_element **)malloc(sizeof(BattlegroundDynamic_element *) * (1 + dynamic_objects_on_map->amount));
 
     int a = 0;
     for (int i = 0; i < pr_map->Y; i++)
@@ -206,10 +205,6 @@ void create_battleground()
     GtkAdjustment *hadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
     GtkAdjustment *vadjCharacter = gtk_adjustment_new(0, 0, 0, 0, 0, 0);
 
-    /*
-    GtkWidget *lay = gtk_fixed_new(hadjCharacter, vadjCharacter);
-    gtk_container_add(GTK_CONTAINER(windowMain), lay);
-    */
     Prototype_map *pr_map = prototype_load_map(mapPath);
 
     GtkWidget *lay = gtk_fixed_new();
@@ -250,6 +245,13 @@ void create_battleground()
     }
 
     set_view_center_By_Character((void *)mainCharacter);
+
+    if (isServer)
+    {
+        //gboolean monster_move(GtkWidget *widget, GdkEventKey *event, gpointer *data)
+        g_timeout_add(1000 / 60, monster_move, NULL);
+        //monster_move(NULL, NULL, NULL);
+    }
 
     gtk_widget_show_all(windowMain);
     g_timeout_add(1000 / 60, readSynchronizationEvent, NULL);

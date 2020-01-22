@@ -480,6 +480,7 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         m->amountsOfSteps = prototype_element->v2;
         m->endIndexX = element->indexStartPointX;
         m->endIndexY = element->indexStartPointY;
+        m->isColision=false;
         if (m->amountsOfSteps > 0)
         {
             if (m->direction == 0)

@@ -21,7 +21,7 @@ int timeForConnectionCheck = 30;//w sek
 bool isServer = true;
 bool reverseKeyBoard = false;
 char *mapPath = "./Maps/Dungeon1.txt";
-int defaultMonsterSpeed = 13;
+int defaultMonsterSpeed = 3;
 int defaultCharacterSpeed = 10;
 int defaultCharacterActionRangePx = 64 / 2;
 long long int loopTime;

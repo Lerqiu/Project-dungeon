@@ -5,7 +5,7 @@ n w p p p w w w p w
 n w p w p w t p p w 
 w p p w ch w ch p p w 
 w g:0 w w w w w w p w 
-w p w m:2 p p p p p w 
+w p w m:1 p p p p p w 
 w p w w w w w w p w 
 w e p p p p p p p w 
 w w w w w w w w w w
