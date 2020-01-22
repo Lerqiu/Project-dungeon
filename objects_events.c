@@ -103,6 +103,15 @@ bool isColisionDynamic(BattlegroundDynamic_element *character_or_monster, Battle
     return false;
 }
 
+void characterDead(BattlegroundDynamic_element *character)
+{
+    printf("You are dead!!\n");
+}
+void characterWin(void)
+{
+    printf("Princess is saved!!\n");
+}
+
 bool isCharacterInRangeOfAction(BattlegroundDynamic_element *character, BattlegroundDynamic_element *obj)
 {
     for (int i = 0; i < 8; i++)
@@ -273,7 +282,7 @@ bool characterSavePrinces(BattlegroundDynamic_element *object)
                     //Uratowanie księżniczki
                     if (!strcmp(object->type, "character"))
                     {
-                        printf("Princess is saved!! funkcja:characterSavePrinces\n");
+                        characterWin();
                         newSmallSynchronizationEvent(object, "princessSaved");
                     }
 
@@ -326,6 +335,81 @@ static void make_move(BattlegroundDynamic_element *object, int oX, int oY)
     }
 }
 
+bool checkIfAttacked(BattlegroundDynamic_element *monster, BattlegroundDynamic_element *character)
+{
+    if (monster->objectData == NULL)
+        return false;
+    MonsterData *mData = (MonsterData *)monster->objectData;
+
+    int posXMonster = (monster->posX + monster->pivotPosX) / DEF_IMAGE_SIZE;
+    int posYMonster = (monster->posY + monster->pivotPosY) / DEF_IMAGE_SIZE;
+
+    int posXCharacter = (character->posX + character->pivotPosX) / DEF_IMAGE_SIZE;
+    int posYCharacter = (character->posY + character->pivotPosY) / DEF_IMAGE_SIZE;
+
+    if (posYCharacter == posYMonster)
+    {
+        if (mData->direction == 1)
+        {
+            if (posXCharacter - posXMonster <= 3 && posXCharacter - posXMonster >= 0)
+                return true;
+        }
+        if (mData->direction == 3)
+        {
+            if (posXCharacter - posXMonster >= -3 && posXCharacter - posXMonster <= 0)
+                return true;
+        }
+    }
+
+    if (posXCharacter == posXMonster)
+    {
+        if (mData->direction == 0)
+        {
+            if (posYCharacter - posXMonster <= 0 && posYCharacter - posXMonster >= -3)
+                return true;
+        }
+        if (mData->direction == 2)
+        {
+            if (posYCharacter - posXMonster <= 3 && posYCharacter - posXMonster >= 0)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+void monstersMakeAttac(void)
+{
+    BattlegroundDynamic_element *characters[2];
+    int a = 0;
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "character"))
+            {
+                characters[a] = dynamic_objects_on_map->tabOfElements[i];
+                a++;
+            }
+    }
+
+    for (int i = 0; i < dynamic_objects_on_map->amount; i++)
+    {
+        if (dynamic_objects_on_map->tabOfElements[i] != NULL)
+        {
+            if (!strcmp(dynamic_objects_on_map->tabOfElements[i]->type, "monster"))
+            {
+                for (int y = 0; y < a; y++)
+                {
+                    if (checkIfAttacked(dynamic_objects_on_map->tabOfElements[i], characters[y]))
+                    {
+                        characterDead(characters[y]);
+                    }
+                }
+            }
+        }
+    }
+}
+
 gboolean monster_move(gpointer data)
 {
     for (int i = 0; i < dynamic_objects_on_map->amount; i++)
@@ -341,17 +425,16 @@ gboolean monster_move(gpointer data)
 
                 if (mData->isColision == true)
                 {
-                    if(mData->direction==0)
-                        mData->direction=2;
-                    else if(mData->direction==1)
-                        mData->direction=3;
-                    else if(mData->direction==2)
-                        mData->direction=0;
-                    else if(mData->direction==3)
-                        mData->direction=1;
+                    if (mData->direction == 0)
+                        mData->direction = 2;
+                    else if (mData->direction == 1)
+                        mData->direction = 3;
+                    else if (mData->direction == 2)
+                        mData->direction = 0;
+                    else if (mData->direction == 3)
+                        mData->direction = 1;
                     mData->isColision = false;
                 }
-
 
                 if (mData->direction == 1)
                     oX += defaultMonsterSpeed;
@@ -363,13 +446,10 @@ gboolean monster_move(gpointer data)
                 else if (mData->direction == 0)
                     oY -= defaultMonsterSpeed;
 
-                //oX/=60;
-                //oY/=60;
-
                 make_move(dynamic_objects_on_map->tabOfElements[i], oX, oY);
             }
     }
-   // printf("Works???\n");
+    monstersMakeAttac();
     return TRUE;
 }
 
