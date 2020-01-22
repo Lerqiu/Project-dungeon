@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <stdbool.h>
 #include <math.h>
+#include <string.h>
 
 #include "objects_events.h"
 #include "settings.h"

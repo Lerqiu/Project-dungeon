@@ -123,7 +123,7 @@ static void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map
 {
     dynamic_objects_on_map = (BattlegroundDynamic *)malloc(sizeof(BattlegroundDynamic));
     dynamic_objects_on_map->amount = amount_of_dynamic_elements(pr_map);
-    dynamic_objects_on_map->tabOfElements = (BattlegroundDynamic_element **)malloc(sizeof(BattlegroundDynamic_element *) * dynamic_objects_on_map->amount);
+    dynamic_objects_on_map->tabOfElements = (BattlegroundDynamic_element **)malloc(sizeof(BattlegroundDynamic_element *) * (1+dynamic_objects_on_map->amount));
 
     int a = 0;
     for (int i = 0; i < pr_map->Y; i++)
@@ -179,7 +179,7 @@ void changeBackgroundCollor(GtkWidget *window)
 
     gtk_style_context_add_provider_for_screen(scr, GTK_STYLE_PROVIDER(cssP), GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssP),
-                                    "window {  \n"
+                                    "GtkWindow {  \n"
                                     "   background-color: #201d20;    \n"
                                     //"   background-color: red;    \n"
                                     "} \n",
@@ -191,7 +191,7 @@ extern GtkWidget *windowMain;
 void create_battleground()
 {
     gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
-    gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
+    //gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
     changeBackgroundCollor(windowMain);
 

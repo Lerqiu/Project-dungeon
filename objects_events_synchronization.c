@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "settings.h"
 #include "fifo.h"
+#include <string.h>
 
 #include "battleground.h"
 #include "objects_events.h"

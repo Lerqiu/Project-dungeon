@@ -52,6 +52,7 @@ Prototype_map *prototype_load_map(char name[])
 
     char buffer[100];
     int index = 0;
+
     while (fscanf(map, "%s", buffer) != EOF)
     {
         char buffor_temporary[100];
@@ -65,8 +66,10 @@ Prototype_map *prototype_load_map(char name[])
         index_of_buffer++;
 
         (board->map + index)->type_of_object = (char *)malloc(sizeof(char) * (strlen(buffor_temporary + 1)));
+        //printf("E:%i:%s \n",index,buffor_temporary);
+        (board->map + index)->type_of_object=(char*)malloc(sizeof(char)*100);
         strcpy((board->map + index)->type_of_object, buffor_temporary);
-
+        //printf("End\n");
         strcpy(buffor_temporary, "");
         int index_of_buffor_temporary = 0;
         while (index_of_buffer < (int)(strlen(buffer)) && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
@@ -76,15 +79,17 @@ Prototype_map *prototype_load_map(char name[])
             index_of_buffor_temporary++;
         }
         buffor_temporary[index_of_buffor_temporary] = '\0';
-
+        //printf("End1\n");
         (board->map + index)->v1 = -1;
         (board->map + index)->v2 = -1;
         sscanf(buffor_temporary, "%i:%i", &((board->map + index)->v1), &((board->map + index)->v2));
 
         index++;
+        //printf("End2\n");
     }
 
     fclose(map);
+    //printf("close\n");
     return board;
 }
 
