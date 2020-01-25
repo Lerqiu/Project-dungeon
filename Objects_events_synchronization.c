@@ -2,20 +2,25 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <stdbool.h>
-#include "settings.h"
-#include "fifo.h"
 #include <string.h>
 
-#include "battleground.h"
-#include "objects_events.h"
+#include "Default_settings.h"
+#include "Windows_FIFO.h"
 
-extern int maxLengthOfPath;
+#include "Objects_basic_types.h"
+#include "Objects_events_synchronization.h"
+#include "Objects_events_synchronization_do_events.h"
+
+#include "Object_gate_events.h"
+#include "Object_key_events.h"
+
+extern int defaultCharTabLength;
 
 void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[]);
 
 void newSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[])
 {
-    char buffer[maxLengthOfPath * 4];
+    char buffer[defaultCharTabLength * 4];
     sprintf(buffer, "Synchronization %s %i %i %s\n", typeOfObject, indexY, indexX, event);
     sendStringToPipe(buffer);
 
@@ -26,7 +31,7 @@ void newSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char e
 void newSmallSynchronizationEvent(void *el, char event[])
 {
     BattlegroundDynamic_element *element = (BattlegroundDynamic_element *)el;
-    char typeOfObject[maxLengthOfPath];
+    char typeOfObject[defaultCharTabLength];
     strcpy(typeOfObject, element->type);
     int indexY = element->indexStartPointY;
     int indexX = element->indexStartPointX;
@@ -36,14 +41,14 @@ void newSmallSynchronizationEvent(void *el, char event[])
 
 gboolean readSynchronizationEvent(gpointer data)
 {
-    char buffer[maxLengthOfPath * 4];
-    if (!getStringFromPipe(buffer, maxLengthOfPath * 4))
+    char buffer[defaultCharTabLength * 4];
+    if (!getStringFromPipe(buffer, defaultCharTabLength * 4))
         return TRUE;
 
-    char typeOfObject[maxLengthOfPath];
+    char typeOfObject[defaultCharTabLength];
     int indexY;
     int indexX;
-    char event[maxLengthOfPath];
+    char event[defaultCharTabLength];
 
     if (sscanf(buffer, "Synchronization %s %i %i %s", typeOfObject, &indexY, &indexX, event) < 4)
         return TRUE;
@@ -61,7 +66,7 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
     {
         if (strlen(event) < 4)
             return;
-        char action[maxLengthOfPath];
+        char action[defaultCharTabLength];
         memcpy(action, event, 4);
         action[4] = '\0';
         //printf("momo:%s\n", action);
@@ -75,14 +80,14 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
     {
         if (!strcmp("open", event))
         {
-            open_gate_Synchronization(getObject_by_ids(indexY, indexX), event);
+            Synchronization_open_gate(indexY,indexX);
         }
     }
     else if (!strcmp("key", typeOfObject))
     {
         if (!strcmp("vanish", event))
         {
-            key_vanish_Synchronization(getObject_by_ids(indexY, indexX), event);
+            Synchronization_key_vanish(indexY, indexX);
         }
     }
 }

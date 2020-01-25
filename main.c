@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "window_creator.h"
+#include "Menu_window_view.h"
+#include "Windows_FIFO.h"
 #include <gtk/gtk.h>
 
 int main(void)
@@ -10,7 +11,9 @@ int main(void)
     gtk_init(NULL, NULL);
     time_t tt;
     srand(time(&tt));
-    createStartWindow();
+    createStartWindowMenu();
+    gtk_main();
+    closePipes();
 
     return 0;
 }

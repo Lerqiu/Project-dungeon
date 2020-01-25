@@ -3,7 +3,6 @@
 
 #include <gtk/gtk.h>
 
-void createStartWindow(void);
-void destroyStartWindowContainers(void);
+void createStartWindowMenu(void);
 
 #endif

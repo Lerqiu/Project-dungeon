@@ -5,31 +5,26 @@
 #include <math.h>
 #include <time.h>
 
-#include "map_loader.h"
-#include "settings.h"
-#include "fifo.h"
-#include "battleground.h"
-#include "window_creator.h"
+#include "Default_settings.h"
+#include "Windows_FIFO.h"
+#include "Menu_window_functionalities.h"
+#include "Battleground_set_view.h"
 
 //Potrzebne w setConnection
 extern bool isServer;
 extern char *mapPath;
 extern bool reverseKeyBoard;
 extern char folderPathMaps[];
-extern int maxLengthOfPath;
+extern int defaultCharTabLength;
 
 extern int timeForConnectionCheck;
 extern int MainCharacterServerSearchMapIndex;
 
 //Ustawienia postaci servera
 extern char *characterNameServer;
-extern char *characterImagePathServer;
 
 //Ustawienia postaci hosta
 extern char *characterNameHost;
-extern char *characterImagePathHost;
-extern int mapRows;
-extern int mapColumns;
 
 int amount_of_checks; //= timeForConnectionCheck;
 GtkWidget *dialPointer = NULL;
@@ -117,12 +112,12 @@ static bool checkRecivedData(void)
             return false;
         if (mapPath != NULL)
             free(mapPath);
-        mapPath = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        mapPath = (char *)malloc(sizeof(char) * defaultCharTabLength);
         strcpy(mapPath, recivedData[2][1]);
 
         if (mapPath != NULL)
             free(characterNameServer);
-        characterNameServer = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        characterNameServer = (char *)malloc(sizeof(char) * defaultCharTabLength);
         strcpy(characterNameServer, recivedData[3][1]);
 
         if (!strcmp(recivedData[5][1], "-1"))
@@ -137,7 +132,7 @@ static bool checkRecivedData(void)
     {
         if (characterNameHost != NULL)
             free(characterNameHost);
-        characterNameHost = (char *)malloc(sizeof(char) * maxLengthOfPath);
+        characterNameHost = (char *)malloc(sizeof(char) * defaultCharTabLength);
         strcpy(characterNameHost, recivedData[3][1]);
     }
 
@@ -151,8 +146,8 @@ static gboolean check_start_signal(void)
     int buffer_size = 1000;
     char buffer[buffer_size];
 
-    char data_1[maxLengthOfPath];
-    char data_2[maxLengthOfPath];
+    char data_1[defaultCharTabLength];
+    char data_2[defaultCharTabLength];
 
     while (a < 40 && getStringFromPipe(buffer, buffer_size))
     {
@@ -212,7 +207,7 @@ static void send_start_signal(char Nick[], GtkWidget *window)
 {
     gint64 time = g_get_real_time();
 
-    char buffer[maxLengthOfPath];
+    char buffer[defaultCharTabLength];
     sprintf(buffer, "%s %li\n", recivedData[0][0], time);
     sendStringToPipe(buffer);
 

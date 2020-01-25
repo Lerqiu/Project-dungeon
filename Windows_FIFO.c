@@ -6,7 +6,7 @@
 #include <gtk/gtk.h>
 #include <fcntl.h>
 
-#include "fifo.h"
+#include "Windows_FIFO.h"
 
 struct pipes
 {

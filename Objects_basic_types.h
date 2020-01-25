@@ -1,8 +1,9 @@
-#ifndef battleground
-#define battleground
+#ifndef Objects_basic_types
+#define Objects_basic_types
 
 #include <gtk/gtk.h>
 #include <stdbool.h>
+//Static
 
 typedef struct battlegroundstatic_element
 {
@@ -23,8 +24,7 @@ typedef struct battlegroundStatic
     int X, Y;
 } BattlegroundStatic;
 
-void create_battleground();
-void destroy_window(GtkWidget *window);
+//////Dynamic
 
 typedef struct monster_data
 {
@@ -66,7 +66,8 @@ typedef struct battlegrounddynamic_element
     int indexStartPointX, indexStartPointY; //unikalny indeks
 
     GtkWidget *image;
-    void *viewData; //Implementacje animacjii póżniej
+    GdkPixbufAnimation  *viewData;
+    //void *viewData; //Implementacje animacjii póżniej
 
     GtkWidget *layout;
 
@@ -88,5 +89,18 @@ typedef struct battlegroundDynamic
     BattlegroundDynamic_element **tabOfElements;
     int amount;
 } BattlegroundDynamic;
+
+//Znajdowanie obiektu
+
+typedef struct
+{
+    int index;
+    BattlegroundDynamic_element *pointer;
+} Pointer_and_Index;
+
+
+BattlegroundDynamic *getObjectByType(char type[]);
+Pointer_and_Index *getObject_by_ids(int indexY, int indexX);
+void delete_BattlegroundDynamic_element(int indexY, int indexX);
 
 #endif

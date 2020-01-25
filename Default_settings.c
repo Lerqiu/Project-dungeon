@@ -3,11 +3,11 @@
 #include <gtk/gtk.h>
 #include <stdbool.h>
 
-#include "settings.h"
+#include "Default_settings.h"
 
 //Ustawienia ogólne
 int DEF_IMAGE_SIZE = 64;
-int maxLengthOfPath = 500;
+int defaultCharTabLength = 500;
 char folderPathImages[] = "./Images/Path/";     //koniecznie zakończona ukośnikiem
 char folderPathDynamic[] = "./Images/Dynamic/"; //koniecznie zakończona ukośnikiem
 char folderPathMaps[] = "./Maps/";              //koniecznie zakończona ukośnikiem
@@ -49,7 +49,7 @@ int characterHostIndexY;
 
 char *FullName_Path_get(char a[], char b[])
 {
-    char *buffer = (char *)malloc(sizeof(char) * (maxLengthOfPath));
+    char *buffer = (char *)malloc(sizeof(char) * (defaultCharTabLength));
     sprintf(buffer, "%s%s", a, b);
     return buffer;
 }
