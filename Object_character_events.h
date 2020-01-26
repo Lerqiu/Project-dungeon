@@ -11,7 +11,7 @@ gboolean character_movie_keyboard(GtkWidget *widget, GdkEventKey *event, gpointe
 
 bool characterSavePrinces(BattlegroundDynamic_element *object);
 
-void characterWin(void);
+void Synchronization_character_win(BattlegroundDynamic_element *character);
 void Synchronization_character_dead(BattlegroundDynamic_element *character);
 
 void Synchronization_move_character(Pointer_and_Index *poi, char event[]);

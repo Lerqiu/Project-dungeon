@@ -32,7 +32,7 @@ extern char *mapPath;
 extern char *characterNameHost;
 extern char *characterNameServer;
 
-BattlegroundDynamic_element *mainCharacter;
+extern BattlegroundDynamic_element *mainCharacter;
 
 GtkWidget *labelsTabRightPanel[4];
 void createRightPanel(GtkWidget *MainBox)

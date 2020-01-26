@@ -84,7 +84,7 @@ void Synchronization_character_dead(BattlegroundDynamic_element *character)
     gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
     character->image = NULL;
 }
-void characterWin(void)
+void Synchronization_character_win(BattlegroundDynamic_element *character)
 {
     printf("Princess is saved!!\n");
 }
@@ -106,7 +106,7 @@ bool characterSavePrinces(BattlegroundDynamic_element *object)
         //Uratowanie księżniczki
         if (!strcmp(object->type, "character"))
         {
-            characterWin();
+            
             newSmallSynchronizationEvent(object, "princessSaved");
         }
 

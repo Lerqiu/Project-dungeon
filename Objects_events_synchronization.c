@@ -76,11 +76,17 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
         {
             Synchronization_move_character(getObject_by_ids(indexY, indexX), event);
         }
-        else if (!strcmp(action, "dead"))
+        else if (!strcmp(event, "dead"))
         {
             Pointer_and_Index *poi = getObject_by_ids(indexY, indexX);
             if (poi != NULL)
                 Synchronization_character_dead(poi->pointer);
+        }
+        else if (!strcmp(event, "princessSaved"))
+        {
+            Pointer_and_Index *poi = getObject_by_ids(indexY, indexX);
+            if (poi != NULL)
+                Synchronization_character_win(poi->pointer);
         }
     }
     else if (!strcmp("monster", typeOfObject))
