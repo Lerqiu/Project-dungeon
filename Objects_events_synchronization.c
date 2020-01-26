@@ -13,6 +13,7 @@
 
 #include "Object_gate_events.h"
 #include "Object_key_events.h"
+#include "Object_trap_events.h"
 #include "Object_monster_events.h"
 #include "Object_character_events.h"
 
@@ -75,6 +76,12 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
         {
             Synchronization_move_character(getObject_by_ids(indexY, indexX), event);
         }
+        else if (!strcmp(action, "dead"))
+        {
+            Pointer_and_Index *poi = getObject_by_ids(indexY, indexX);
+            if (poi != NULL)
+                Synchronization_character_dead(poi->pointer);
+        }
     }
     else if (!strcmp("monster", typeOfObject))
     {
@@ -100,6 +107,13 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
         if (!strcmp("vanish", event))
         {
             Synchronization_key_vanish(indexY, indexX);
+        }
+    }
+    else if (!strcmp("trap", typeOfObject))
+    {
+        if (!strcmp("launched", event))
+        {
+            Synchronization_launched_trap(indexY, indexX);
         }
     }
     else if (!strcmp("GtkWindow", typeOfObject))

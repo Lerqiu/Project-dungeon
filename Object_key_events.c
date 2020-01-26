@@ -83,6 +83,23 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
     }
 }
 
+void characterClearKeys(BattlegroundDynamic_element *object)
+{
+
+    if (strcmp(object->type, "character"))
+        return;
+
+    CharacterData *ch = (CharacterData *)object->objectData;
+    for (int key = 0; key < 4; key++)
+    {
+        ch->keyTab[key]=0;
+        extern GtkWidget *labelsTabRightPanel[4];
+        char buffer[100];
+        sprintf(buffer, "%i", ch->keyTab[key]);
+        gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[key]), buffer);
+    }
+}
+
 void Synchronization_key_vanish(int indexY, int indexX)
 {
     delete_BattlegroundDynamic_element(indexY, indexX);

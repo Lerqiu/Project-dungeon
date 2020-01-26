@@ -170,7 +170,8 @@ void monstersMakeAttac(void)
             if (checkIfAttacked(monsters->tabOfElements[y], characters->tabOfElements[i]))
             {
                 //printf("Check\n");
-                characterDead(characters->tabOfElements[i]);
+                //characterDead(characters->tabOfElements[i]);
+                newSmallSynchronizationEvent(characters->tabOfElements[i], "dead");
             }
         }
 }

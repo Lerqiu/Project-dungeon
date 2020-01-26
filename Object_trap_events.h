@@ -6,5 +6,6 @@
 #include "Objects_basic_types.h"
 
 bool characterStepOnTrap(BattlegroundDynamic_element *object);
+void Synchronization_launched_trap(int indexY, int indexX);
 
 #endif

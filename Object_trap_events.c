@@ -31,3 +31,8 @@ bool characterStepOnTrap(BattlegroundDynamic_element *object)
     }
     return false;
 }
+
+void Synchronization_launched_trap(int indexY, int indexX)
+{
+    delete_BattlegroundDynamic_element(indexY, indexX);
+}

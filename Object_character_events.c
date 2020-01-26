@@ -72,9 +72,17 @@ void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, i
     characterSavePrinces(object);
 }
 
-void characterDead(BattlegroundDynamic_element *character)
+void Synchronization_character_dead(BattlegroundDynamic_element *character)
 {
     printf("You are dead, indexX:%i indexY:%i!!\n", character->indexStartPointX, character->indexStartPointY);
+    characterClearKeys(character);
+    free(character->type);
+    character->type = (char *)malloc(sizeof(char) * defaultCharTabLength);
+    strcpy(character->type, "dead_character");
+
+    gtk_image_clear(GTK_IMAGE(character->image));
+    gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
+    character->image = NULL;
 }
 void characterWin(void)
 {
@@ -161,6 +169,10 @@ void objects_movie_left(gpointer *pointer)
 
 gboolean character_movie_keyboard_reverse(GtkWidget *widget, GdkEventKey *event, gpointer *data)
 {
+    BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)data;
+    if (strcmp(object->type, "character"))
+        return TRUE;
+
     if (event->keyval == GDK_KEY_w || event->keyval == GDK_KEY_W)
     {
         // printf(u8"Key pressed, go up objects_event.c keyBoard type:Reversed\n");
@@ -186,7 +198,6 @@ gboolean character_movie_keyboard_reverse(GtkWidget *widget, GdkEventKey *event,
         return TRUE;
     }
 
-    BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)data;
     if (event->keyval == GDK_KEY_1)
     {
         characterKeyUse(object, 0);
@@ -217,6 +228,10 @@ gboolean character_movie_keyboard_reverse(GtkWidget *widget, GdkEventKey *event,
 
 gboolean character_movie_keyboard(GtkWidget *widget, GdkEventKey *event, gpointer *data)
 {
+    BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)data;
+    if (strcmp(object->type, "character"))
+        return TRUE;
+
     if (event->keyval == GDK_KEY_Up)
     {
         //printf(u8"Key pressed, go up objects_event.c keyBoard type:Normal\n");
@@ -242,7 +257,6 @@ gboolean character_movie_keyboard(GtkWidget *widget, GdkEventKey *event, gpointe
         return TRUE;
     }
 
-    BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)data;
     if (event->keyval == GDK_KEY_V || event->keyval == GDK_KEY_v)
     {
         characterKeyUse(object, 0);

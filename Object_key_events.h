@@ -7,6 +7,7 @@
 
 void characterGetKey(BattlegroundDynamic_element *object);
 void characterKeyUse(BattlegroundDynamic_element *object, int key);
+void characterClearKeys(BattlegroundDynamic_element *object);
 
 void Synchronization_key_vanish(int indexY, int indexX);
 
