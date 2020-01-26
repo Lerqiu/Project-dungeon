@@ -8,17 +8,73 @@
 #include "Objects_events.h"
 #include "Objects_events_synchronization.h"
 #include "Object_key_events.h"
+#include "Object_gate_events.h"
+#include "Object_trap_events.h"
 #include "Objects_basic_types.h"
 #include "Default_settings.h"
 
 extern int windowHeight;
 extern int windowWidth;
+extern int defaultCharTabLength;
 
 extern BattlegroundDynamic *dynamic_objects_on_map;
 
+void Synchronization_move_character(Pointer_and_Index *poi, char event[])
+{
+    if (strcmp("character", poi->pointer->type))
+        return;
+
+    int X, Y;
+    if (sscanf(event, "move-%i-%i", &Y, &X) < 2)
+        return;
+
+    if (poi == NULL)
+        return;
+
+    BattlegroundDynamic_element *object = poi->pointer;
+
+    object->posX = X;
+    object->posY = Y;
+
+    if (object->image != NULL)
+    {
+        gtk_fixed_move(GTK_FIXED(object->layout), object->image, X, Y);
+    }
+    free(poi);
+}
+
+void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int oY)
+{
+    if (object == NULL)
+        return;
+
+    if (strcmp(object->type, "character"))
+        return;
+
+    int x = object->posX + oX + object->pivotPosX;
+    int y = object->posY + oY + object->pivotPosY;
+
+    if (isHumanoidOnPath(object, x, y) == true && humanoidColisionGate(object, x, y) == false)
+    {
+        object->posX = object->posX + oX;
+        object->posY = object->posY + oY;
+        if (object->image != NULL)
+        {
+            char action[defaultCharTabLength];
+            sprintf(action, "move-%i-%i", object->posY, object->posX);
+            newSmallSynchronizationEvent(object, action);
+            gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+        }
+    }
+    characterGetKey(object);
+
+    characterStepOnTrap(object);
+    characterSavePrinces(object);
+}
+
 void characterDead(BattlegroundDynamic_element *character)
 {
-    printf("You are dead!!\n");
+    printf("You are dead, indexX:%i indexY:%i!!\n", character->indexStartPointX, character->indexStartPointY);
 }
 void characterWin(void)
 {
@@ -34,7 +90,7 @@ bool characterSavePrinces(BattlegroundDynamic_element *object)
 
     BattlegroundDynamic *princess = getObjectByType("princess");
 
-    if(princess->amount<1)
+    if (princess->amount < 1)
         return false;
 
     if (isCharacterInRangeOfAction(object, princess->tabOfElements[0]))
@@ -69,7 +125,7 @@ void objects_movie_up(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
-    make_move(object, 0, -object->speed);
+    character_move_set_on_layout(object, 0, -object->speed);
     if (!strcmp(object->type, "character"))
         set_view_center_By_Character(object);
 }
@@ -77,7 +133,7 @@ void objects_movie_right(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
-    make_move(object, object->speed, 0);
+    character_move_set_on_layout(object, object->speed, 0);
     if (!strcmp(object->type, "character"))
         set_view_center_By_Character(object);
 
@@ -87,7 +143,7 @@ void objects_movie_down(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
-    make_move(object, 0, +object->speed);
+    character_move_set_on_layout(object, 0, +object->speed);
     if (!strcmp(object->type, "character"))
         set_view_center_By_Character(object);
 
@@ -97,7 +153,7 @@ void objects_movie_left(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
-    make_move(object, -object->speed, 0);
+    character_move_set_on_layout(object, -object->speed, 0);
     if (!strcmp(object->type, "character"))
         set_view_center_By_Character(object);
     // printf("left\n");

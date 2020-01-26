@@ -29,6 +29,7 @@ typedef struct battlegroundStatic
 typedef struct monster_data
 {
     int direction;
+    int indexOfFrame;
     int amountsOfSteps;
     int endIndexX;
     int endIndexY;
@@ -66,7 +67,7 @@ typedef struct battlegrounddynamic_element
     int indexStartPointX, indexStartPointY; //unikalny indeks
 
     GtkWidget *image;
-    GdkPixbufAnimation  *viewData;
+    GtkWidget *viewData;
     //void *viewData; //Implementacje animacjii póżniej
 
     GtkWidget *layout;

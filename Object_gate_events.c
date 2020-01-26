@@ -40,6 +40,23 @@ bool humanoidColisionGate(BattlegroundDynamic_element *object, int oX, int oY)
     return false;
 }
 
+bool isThereAGate(int indexY, int indexX)
+{
+
+    BattlegroundDynamic *gates = getObjectByType("gate");
+
+    for (int i = 0; i < gates->amount; i++)
+    {
+
+        if (indexY == gates->tabOfElements[i]->indexStartPointY && indexX == gates->tabOfElements[i]->indexStartPointX)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Synchronization_open_gate(int indexY, int indexX)
 {
     delete_BattlegroundDynamic_element(indexY, indexX);

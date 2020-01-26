@@ -18,4 +18,6 @@ void checkCorrectData(GtkWidget *PlayButton, gpointer data);
 gboolean createStartWindowShowHideMaps(GtkWidget *widget, GParamSpec *pspec, gpointer data);
 GSList *createStartWindowShowMap(GtkWidget *parentContainer);
 
+void destroyWindow(gpointer data);
+
 #endif

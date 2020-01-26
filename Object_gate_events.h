@@ -9,5 +9,6 @@
 
 bool humanoidColisionGate(BattlegroundDynamic_element *object, int oX, int oY);
 void Synchronization_open_gate(int indexY, int indexX);
+bool isThereAGate(int indexY, int indexX);
 
 #endif

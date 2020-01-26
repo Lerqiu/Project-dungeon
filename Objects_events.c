@@ -19,21 +19,30 @@ extern BattlegroundStatic *static_objects_on_map;
 extern int DEF_IMAGE_SIZE;
 extern int defaultCharTabLength;
 
+bool isAPath(int X, int Y)
+{
+    if (!strcmp("path", static_objects_on_map->map[(Y / DEF_IMAGE_SIZE) * static_objects_on_map->X + X / DEF_IMAGE_SIZE]->type))
+        return true;
+
+    return false;
+}
+
+
 bool isHumanoidOnPath(BattlegroundDynamic_element *object, int X, int Y)
 {
     if (strcmp("path", static_objects_on_map->map[(Y / DEF_IMAGE_SIZE) * static_objects_on_map->X + X / DEF_IMAGE_SIZE]->type))
-        return true;
+        return false;
 
     for (int i = 0; i < 8; i++)
     {
         if (strcmp("path", static_objects_on_map->map[(int)(((sin((2.0 / 8.0 * i * 3.14)) * object->colisionCheckY + Y)) / DEF_IMAGE_SIZE) * static_objects_on_map->X + (int)(((cos(2.0 / 8.0 * i * 3.14) * object->colisionCheckX) + X) / DEF_IMAGE_SIZE)]->type))
         {
-            return true;
+            return false;
         }
     }
 
 
-    return false;
+    return true;
 }
 
 bool isColisionDynamic(BattlegroundDynamic_element *character_or_monster, BattlegroundDynamic_element *obj)
@@ -94,47 +103,7 @@ bool isCharacterInRangeOfAction(BattlegroundDynamic_element *character, Battlegr
     return false;
 }
 
-void make_move(BattlegroundDynamic_element *object, int oX, int oY)
-{
-    if (object == NULL)
-        return;
 
-    int x = object->posX + oX + object->pivotPosX;
-    int y = object->posY + oY + object->pivotPosY;
-
-    if (!strcmp(object->type, "character") || !strcmp(object->type, "monster"))
-    {
-        if (isHumanoidOnPath(object, x, y) == false && humanoidColisionGate(object, x, y) == false)
-        {
-            object->posX = object->posX + oX;
-            object->posY = object->posY + oY;
-            if (object->image != NULL)
-            {
-                //gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
-                char action[defaultCharTabLength];
-                sprintf(action, "move-%i-%i", object->posY, object->posX);
-                newSmallSynchronizationEvent(object, action);
-                gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
-            }
-        }
-        else
-        {
-            if (!strcmp(object->type, "monster"))
-            {
-                MonsterData *mData = (MonsterData *)object->objectData;
-                mData->isColision = true;
-            }
-        }
-
-        if (!strcmp(object->type, "character"))
-        {
-            characterGetKey(object);
-
-            characterStepOnTrap(object);
-            characterSavePrinces(object);
-        }
-    }
-}
 
 
 

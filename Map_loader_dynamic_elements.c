@@ -35,7 +35,7 @@ int amount_of_dynamic_elements(Prototype_map *pr_map)
 void map_create_std_dynamic(int x, int y, BattlegroundDynamic_element *element, char type[])
 {
     element->image = NULL;
-    element->viewData=NULL;
+    element->viewData = NULL;
     element->height = DEF_IMAGE_SIZE;
     element->width = DEF_IMAGE_SIZE;
     element->posX = x * DEF_IMAGE_SIZE;
@@ -123,6 +123,7 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         m->endIndexX = element->indexStartPointX;
         m->endIndexY = element->indexStartPointY;
         m->isColision = false;
+        m->indexOfFrame=0;
         if (m->amountsOfSteps > 0)
         {
             if (m->direction == 0)
@@ -137,12 +138,16 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
 
         char pathToFile[defaultCharTabLength];
         //sprintf(pathToFile, "%s%s%s", folderPathDynamic, "monster", ".png");
-        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "skeleton", ".gif");
-        
+        sprintf(pathToFile, "%s%s%s", folderPathDynamic, "skeleton", ".png");
+
         //element->image=NULL;
-        element->viewData = gdk_pixbuf_animation_new_from_file(pathToFile,NULL);
+        element->viewData = gtk_image_new_from_file(pathToFile);
+        GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+        gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(element->viewData)), pixbuf, 0, 0, 64, 64, -64, -64, 1.0, 1.0, GDK_INTERP_NEAREST);
         //element->image = gtk_image_new_from_file(pathToFile);
-        element->image = gtk_image_new_from_animation(element->viewData);
+        element->image = gtk_image_new_from_pixbuf(pixbuf);
+
+        g_object_unref(pixbuf);
 
         element->objectData = (void *)m;
     }

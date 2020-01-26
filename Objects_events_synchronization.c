@@ -6,13 +6,15 @@
 
 #include "Default_settings.h"
 #include "Windows_FIFO.h"
+#include "Menu_window_functionalities.h"
 
 #include "Objects_basic_types.h"
 #include "Objects_events_synchronization.h"
-#include "Objects_events_synchronization_do_events.h"
 
 #include "Object_gate_events.h"
 #include "Object_key_events.h"
+#include "Object_monster_events.h"
+#include "Object_character_events.h"
 
 extern int defaultCharTabLength;
 
@@ -62,25 +64,35 @@ gboolean readSynchronizationEvent(gpointer data)
 
 void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[])
 {
-    if (!strcmp("character", typeOfObject) || !strcmp("monster", typeOfObject))
+    if (!strcmp("character", typeOfObject))
     {
         if (strlen(event) < 4)
             return;
         char action[defaultCharTabLength];
         memcpy(action, event, 4);
         action[4] = '\0';
-        //printf("momo:%s\n", action);
         if (!strcmp(action, "move"))
         {
-            //printf("redy for movie\n");
-            make_move_Synchronization(getObject_by_ids(indexY, indexX), event);
+            Synchronization_move_character(getObject_by_ids(indexY, indexX), event);
+        }
+    }
+    else if (!strcmp("monster", typeOfObject))
+    {
+        if (strlen(event) < 4)
+            return;
+        char action[defaultCharTabLength];
+        memcpy(action, event, 4);
+        action[4] = '\0';
+        if (!strcmp(action, "move"))
+        {
+            Synchronization_move_monster(getObject_by_ids(indexY, indexX), event);
         }
     }
     else if (!strcmp("gate", typeOfObject))
     {
         if (!strcmp("open", event))
         {
-            Synchronization_open_gate(indexY,indexX);
+            Synchronization_open_gate(indexY, indexX);
         }
     }
     else if (!strcmp("key", typeOfObject))
@@ -89,5 +101,16 @@ void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, ch
         {
             Synchronization_key_vanish(indexY, indexX);
         }
+    }
+    else if (!strcmp("GtkWindow", typeOfObject))
+    {
+        if (!strcmp("destroy", event))
+        {
+            destroyWindow(NULL);
+        }
+    }
+    else
+    {
+        printf("Nieznany typ: %s %i %i %s\n", typeOfObject, indexY, indexX, event);
     }
 }

@@ -95,7 +95,7 @@ void createStartWindowMenu(void)
     gtk_widget_set_halign(buttonPlay, GTK_ALIGN_END);
     gtk_container_add(GTK_CONTAINER(boxLPlay), buttonPlay);
 
-    g_signal_connect(G_OBJECT(windowMain), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(G_OBJECT(windowMain), "destroy", G_CALLBACK(destroyWindow), NULL);
     gtk_window_set_default_size(GTK_WINDOW(windowMain), 400, 240 * 2);
 
     gtk_widget_show_all(windowMain);

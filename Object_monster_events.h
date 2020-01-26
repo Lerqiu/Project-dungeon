@@ -3,7 +3,10 @@
 
 #include <gtk/gtk.h>
 
-gboolean monster_move(gpointer data);
+#include "Objects_basic_types.h"
 
+gboolean monster_move(gpointer data);
+void monsterChangeBodyView(BattlegroundDynamic_element *monster);
+void Synchronization_move_monster(Pointer_and_Index *poi, char event[]);
 
 #endif

@@ -129,10 +129,6 @@ void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWi
         if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
         {
             gtk_fixed_put(GTK_FIXED(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
-            if (!strcmp("monster", dynamic_objects_on_map->tabOfElements[a]->type))
-            {
-                gdk_pixbuf_simple_anim_set_loop(GDK_PIXBUF_SIMPLE_ANIM(dynamic_objects_on_map->tabOfElements[a]->viewData), TRUE);
-            }
         }
     }
 }

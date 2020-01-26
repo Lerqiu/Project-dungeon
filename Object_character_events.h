@@ -14,4 +14,6 @@ bool characterSavePrinces(BattlegroundDynamic_element *object);
 void characterWin(void);
 void characterDead(BattlegroundDynamic_element *character);
 
+void Synchronization_move_character(Pointer_and_Index *poi, char event[]);
+
 #endif

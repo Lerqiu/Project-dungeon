@@ -141,3 +141,12 @@ void destroyStartWindowContainers(void)
         scrollWindowWidget = NULL;
     }
 }
+
+void destroyWindow(gpointer data)
+{
+    if (isConnectedPipe()){
+        sendStringToPipe("Synchronization GtkWindow 0 0 destroy\n");
+    }
+        
+    gtk_main_quit();
+}
