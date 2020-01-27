@@ -21,14 +21,23 @@ extern int defaultCharTabLength;
 
 void recivedSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[]);
 
+bool isNewSynchronizationActive = true;
+
+void deactive_newSynchronizationEvent(void)
+{
+    isNewSynchronizationActive = false;
+}
+
 void newSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[])
 {
+    if (!isNewSynchronizationActive)
+        return;
+
     char buffer[defaultCharTabLength * 4];
     sprintf(buffer, "Synchronization %s %i %i %s\n", typeOfObject, indexY, indexX, event);
     sendStringToPipe(buffer);
 
     recivedSynchronizationEvent(typeOfObject, indexY, indexX, event);
-    //printf("Synchronization: OType:%s IY:%i IX:%i Event:%s\n",typeOfObject,indexY,indexX,event);
 }
 
 void newSmallSynchronizationEvent(void *el, char event[])
@@ -58,7 +67,6 @@ gboolean readSynchronizationEvent(gpointer data)
 
     recivedSynchronizationEvent(typeOfObject, indexY, indexX, event);
 
-    //printf("Synchronization: OType:%s IY:%i IX:%i Event:%s\n",typeOfObject,indexY,indexX,event);
     readSynchronizationEvent(NULL); //Wymagane by zachować płynność gry
     return TRUE;
 }

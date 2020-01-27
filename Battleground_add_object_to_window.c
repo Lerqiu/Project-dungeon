@@ -20,6 +20,7 @@ extern bool isServer;
 extern int MainCharacterServerSearchMapIndex;
 
 extern BattlegroundDynamic_element *mainCharacter;
+extern BattlegroundDynamic_element *showCharacterPointer;
 
 void create_battleground_static(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
 {
@@ -59,7 +60,7 @@ void create_battleground__static_top(GtkWidget *window, Prototype_map *pr_map, G
     }
 }
 
-void create_character(BattlegroundDynamic *map)
+void create_character(BattlegroundDynamic *map, GtkAdjustment *hadjCharacter, GtkAdjustment *vadjCharacter)
 {
     BattlegroundDynamic_element *character[2];
 
@@ -69,6 +70,9 @@ void create_character(BattlegroundDynamic *map)
         if (!strcmp(map->tabOfElements[a]->type, "character"))
         {
             character[b] = map->tabOfElements[a];
+            CharacterData *characData = (CharacterData *)(character[b]->objectData);
+            characData->hadj = hadjCharacter;
+            characData->vadj = vadjCharacter;
             b++;
         }
     }
@@ -103,9 +107,21 @@ void create_character(BattlegroundDynamic *map)
         characterHostIndexX = character[MainCharacterServerSearchMapIndex]->indexStartPointX;
         characterHostIndexY = character[MainCharacterServerSearchMapIndex]->indexStartPointY;
     }
+    showCharacterPointer = mainCharacter;
 }
 
-void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay)
+void battleground_draw_battleground_dynamic(BattlegroundDynamic *elements)
+{
+    for (int a = 0; a < elements->amount; a++)
+    {
+        if (elements->tabOfElements[a]->image != NULL)
+        {
+            gtk_fixed_put(GTK_FIXED(elements->tabOfElements[a]->layout), elements->tabOfElements[a]->image, elements->tabOfElements[a]->posX, elements->tabOfElements[a]->posY);
+        }
+    }
+}
+
+void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay, GtkAdjustment *hadjCharacter, GtkAdjustment *vadjCharacter)
 {
     dynamic_objects_on_map = (BattlegroundDynamic *)malloc(sizeof(BattlegroundDynamic));
     dynamic_objects_on_map->amount = amount_of_dynamic_elements(pr_map);
@@ -119,16 +135,20 @@ void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWi
             dynamic_objects_on_map->tabOfElements[a] = NULL;
             dynamic_objects_on_map->tabOfElements[a] = load_battleground_dynamic((pr_map->map + i * pr_map->X + q), q, i);
             if (dynamic_objects_on_map->tabOfElements[a] != NULL)
+            {
+                dynamic_objects_on_map->tabOfElements[a]->layout = lay;
                 a++;
+            }
         }
     }
-    create_character(dynamic_objects_on_map);
-    for (int a = 0; a < dynamic_objects_on_map->amount; a++)
-    {
-        dynamic_objects_on_map->tabOfElements[a]->layout = lay;
-        if (dynamic_objects_on_map->tabOfElements[a]->image != NULL)
-        {
-            gtk_fixed_put(GTK_FIXED(lay), dynamic_objects_on_map->tabOfElements[a]->image, dynamic_objects_on_map->tabOfElements[a]->posX, dynamic_objects_on_map->tabOfElements[a]->posY);
-        }
-    }
+
+    create_character(dynamic_objects_on_map, hadjCharacter, vadjCharacter);
+
+    //Rysowanie na mapie
+    battleground_draw_battleground_dynamic(getObjectByType("trap"));
+    battleground_draw_battleground_dynamic(getObjectByType("key"));
+    battleground_draw_battleground_dynamic(getObjectByType("gate"));
+    battleground_draw_battleground_dynamic(getObjectByType("monster"));
+    battleground_draw_battleground_dynamic(getObjectByType("princess"));
+    battleground_draw_battleground_dynamic(getObjectByType("character"));
 }

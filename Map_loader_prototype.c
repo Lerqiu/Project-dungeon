@@ -3,6 +3,9 @@
 #include <string.h>
 
 #include "Map_loader_prototype.h"
+#include "Default_settings.h"
+
+extern int defaultCharTabLength;
 
 Prototype_map *prototype_load_map(char name[])
 {
@@ -23,12 +26,12 @@ Prototype_map *prototype_load_map(char name[])
 
     board->map = (Prototype_map_element *)malloc(sizeof(Prototype_map_element) * X * Y);
 
-    char buffer[100];
+    char buffer[defaultCharTabLength];
     int index = 0;
 
     while (fscanf(map, "%s", buffer) != EOF)
     {
-        char buffor_temporary[100];
+        char buffor_temporary[defaultCharTabLength];
         int index_of_buffer = 0;
         while (index_of_buffer < (int)(strlen(buffer)) && buffer[index_of_buffer] != ':' && buffer[index_of_buffer] != '\0' && buffer[index_of_buffer] != '\n' && buffer[index_of_buffer] != EOF)
         {

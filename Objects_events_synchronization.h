@@ -7,5 +7,6 @@ gboolean readSynchronizationEvent(gpointer data);
 void newSynchronizationEvent(char typeOfObject[], int indexY, int indexX, char event[]);
 void newSmallSynchronizationEvent(void *el, char event[]);
 
+void deactive_newSynchronizationEvent(void);
 
 #endif

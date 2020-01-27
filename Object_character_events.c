@@ -10,14 +10,19 @@
 #include "Object_key_events.h"
 #include "Object_gate_events.h"
 #include "Object_trap_events.h"
+#include "Object_monster_events.h"
+#include "Object_princess_events.h"
 #include "Objects_basic_types.h"
 #include "Default_settings.h"
+#include "Battleground_set_view.h"
 
-extern int windowHeight;
-extern int windowWidth;
 extern int defaultCharTabLength;
 
 extern BattlegroundDynamic *dynamic_objects_on_map;
+extern BattlegroundDynamic_element *mainCharacter;
+extern BattlegroundDynamic_element *showCharacterPointer;
+
+//Synchronizacja danych
 
 void Synchronization_move_character(Pointer_and_Index *poi, char event[])
 {
@@ -42,6 +47,67 @@ void Synchronization_move_character(Pointer_and_Index *poi, char event[])
     }
     free(poi);
 }
+
+void Synchronization_character_dead(BattlegroundDynamic_element *character)
+{
+    characterClearKeys(character);
+    free(character->type);
+    character->type = (char *)malloc(sizeof(char) * defaultCharTabLength);
+    strcpy(character->type, "dead_character");
+
+    gtk_image_clear(GTK_IMAGE(character->image));
+    gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
+    character->image = NULL;
+
+    if (character->indexStartPointX == mainCharacter->indexStartPointX &&
+        character->indexStartPointY == mainCharacter->indexStartPointY)
+    {
+        showEndInfoAboutGame("Umarłeś", -1000 * 3);
+    }
+    BattlegroundDynamic *characters = getObjectByType("character");
+    if (characters->amount == 0)
+    {
+        deactive_newSynchronizationEvent();
+        deactive_Monsters();
+        showEndInfoAboutGame("Remis", 1000 * 3);
+        return;
+    }
+
+    for (int i = 0; i < characters->amount; i++)
+    {
+        showCharacterPointer = characters->tabOfElements[i];
+    }
+}
+
+void character_clear_type(void)
+{
+    BattlegroundDynamic *characters = getObjectByType("character");
+
+    for (int i = 0; i < characters->amount; i++)
+    {
+        free(characters->tabOfElements[i]->type);
+        characters->tabOfElements[i]->type = (char *)malloc(sizeof(char) * defaultCharTabLength);
+        strcpy(characters->tabOfElements[i]->type, "dead_character");
+    }
+}
+
+void Synchronization_character_win(BattlegroundDynamic_element *character)
+{
+    if (character->indexStartPointX == mainCharacter->indexStartPointX &&
+        character->indexStartPointY == mainCharacter->indexStartPointY)
+    {
+        showEndInfoAboutGame("Wygrałeś", 1000 * 3);
+    }
+    else
+    {
+        showEndInfoAboutGame("Przegrałeś", 1000 * 3);
+    }
+    character_clear_type();
+    deactive_newSynchronizationEvent();
+    deactive_Monsters();
+}
+
+//Pozostałe
 
 void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int oY)
 {
@@ -69,64 +135,7 @@ void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, i
     characterGetKey(object);
 
     characterStepOnTrap(object);
-    characterSavePrinces(object);
-}
-
-void Synchronization_character_dead(BattlegroundDynamic_element *character)
-{
-    printf("You are dead, indexX:%i indexY:%i!!\n", character->indexStartPointX, character->indexStartPointY);
-    characterClearKeys(character);
-    free(character->type);
-    character->type = (char *)malloc(sizeof(char) * defaultCharTabLength);
-    strcpy(character->type, "dead_character");
-
-    gtk_image_clear(GTK_IMAGE(character->image));
-    gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
-    character->image = NULL;
-}
-void Synchronization_character_win(BattlegroundDynamic_element *character)
-{
-    printf("Princess is saved!!\n");
-}
-
-bool characterSavePrinces(BattlegroundDynamic_element *object)
-{
-    if (object == NULL)
-        return false;
-    if (strcmp(object->type, "character"))
-        return false;
-
-    BattlegroundDynamic *princess = getObjectByType("princess");
-
-    if (princess->amount < 1)
-        return false;
-
-    if (isCharacterInRangeOfAction(object, princess->tabOfElements[0]))
-    {
-        //Uratowanie księżniczki
-        if (!strcmp(object->type, "character"))
-        {
-            
-            newSmallSynchronizationEvent(object, "princessSaved");
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
-void set_view_center_By_Character(void *ob)
-{
-    BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)ob;
-    if ((object->objectData) == NULL)
-        return;
-
-    CharacterData *data = (CharacterData *)(object->objectData);
-    gdouble newX = object->posX - windowWidth / 2;
-    gdouble newY = object->posY - windowHeight / 2;
-    gtk_adjustment_set_value(data->hadj, newX);
-    gtk_adjustment_set_value(data->vadj, newY);
+    princes_save(object);
 }
 
 void objects_movie_up(gpointer *pointer)
@@ -134,16 +143,12 @@ void objects_movie_up(gpointer *pointer)
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
     character_move_set_on_layout(object, 0, -object->speed);
-    if (!strcmp(object->type, "character"))
-        set_view_center_By_Character(object);
 }
 void objects_movie_right(gpointer *pointer)
 {
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
     character_move_set_on_layout(object, object->speed, 0);
-    if (!strcmp(object->type, "character"))
-        set_view_center_By_Character(object);
 
     //printf("right\n");
 }
@@ -152,8 +157,6 @@ void objects_movie_down(gpointer *pointer)
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
     character_move_set_on_layout(object, 0, +object->speed);
-    if (!strcmp(object->type, "character"))
-        set_view_center_By_Character(object);
 
     //printf("dowm\n");
 }
@@ -162,8 +165,6 @@ void objects_movie_left(gpointer *pointer)
     BattlegroundDynamic_element *object = (BattlegroundDynamic_element *)pointer;
 
     character_move_set_on_layout(object, -object->speed, 0);
-    if (!strcmp(object->type, "character"))
-        set_view_center_By_Character(object);
     // printf("left\n");
 }
 
@@ -175,25 +176,21 @@ gboolean character_movie_keyboard_reverse(GtkWidget *widget, GdkEventKey *event,
 
     if (event->keyval == GDK_KEY_w || event->keyval == GDK_KEY_W)
     {
-        // printf(u8"Key pressed, go up objects_event.c keyBoard type:Reversed\n");
         objects_movie_up(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_d || event->keyval == GDK_KEY_D)
     {
-        //printf(u8"Key pressed, right up objects_event.c keyBoard type:Reversed\n");
         objects_movie_right(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_s || event->keyval == GDK_KEY_S)
     {
-        //printf(u8"Key pressed, go down objects_event.c keyBoard type:Reversed\n");
         objects_movie_down(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_a || event->keyval == GDK_KEY_A)
     {
-        //printf(u8"Key pressed, go left objects_event.c keyBoard type:Reversed\n");
         objects_movie_left(data);
         return TRUE;
     }
@@ -234,25 +231,21 @@ gboolean character_movie_keyboard(GtkWidget *widget, GdkEventKey *event, gpointe
 
     if (event->keyval == GDK_KEY_Up)
     {
-        //printf(u8"Key pressed, go up objects_event.c keyBoard type:Normal\n");
         objects_movie_up(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_Right)
     {
-        //printf(u8"Key pressed, go right objects_event.c keyBoard type:Normal\n");
         objects_movie_right(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_Down)
     {
-        //printf(u8"Key pressed, go down objects_event.c keyBoard type:Normal\n");
         objects_movie_down(data);
         return TRUE;
     }
     else if (event->keyval == GDK_KEY_Left)
     {
-        //printf(u8"Key pressed, go left objects_event.c keyBoard type:Normal\n");
         objects_movie_left(data);
         return TRUE;
     }

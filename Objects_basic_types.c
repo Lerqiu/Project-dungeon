@@ -4,6 +4,7 @@ BattlegroundStatic *static_objects_on_map = NULL;
 BattlegroundDynamic *dynamic_objects_on_map = NULL;
 
 BattlegroundDynamic_element *mainCharacter = NULL;
+BattlegroundDynamic_element *showCharacterPointer = NULL;
 
 BattlegroundDynamic *getObjectByType(char type[])
 {
@@ -76,7 +77,7 @@ void delete_BattlegroundDynamic_element(int indexY, int indexX)
 
                 free(dynamic_objects_on_map->tabOfElements[i]);
                 dynamic_objects_on_map->tabOfElements[i] = NULL;
-                break;
+                return;
             }
     }
 }

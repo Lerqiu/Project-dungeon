@@ -7,6 +7,6 @@
 
 void create_battleground_static(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay);
 void create_battleground__static_top(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay);
-void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay);
+void create_battleground_dynamic(GtkWidget *window, Prototype_map *pr_map, GtkWidget *lay,GtkAdjustment *hadjCharacter ,GtkAdjustment *vadjCharacter );
 
 #endif

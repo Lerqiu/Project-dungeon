@@ -143,7 +143,7 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         //element->image=NULL;
         element->viewData = gtk_image_new_from_file(pathToFile);
         GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
-        gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(element->viewData)), pixbuf, 0, 0, 64, 64, -64, -64, 1.0, 1.0, GDK_INTERP_NEAREST);
+        gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(element->viewData)), pixbuf, 0, 0, 64, 64, 0, 0, 1.0, 1.0, GDK_INTERP_NEAREST);
         //element->image = gtk_image_new_from_file(pathToFile);
         element->image = gtk_image_new_from_pixbuf(pixbuf);
 

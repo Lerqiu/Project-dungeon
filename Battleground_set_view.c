@@ -7,7 +7,6 @@
 #include "Battleground_set_view.h"
 #include "Battleground_add_object_to_window.h"
 
-
 #include "Object_character_events.h"
 #include "Object_monster_events.h"
 #include "Objects_events_synchronization.h"
@@ -19,6 +18,7 @@
 #include "Map_loader_statics_elements.h"
 #include "Map_loader_dynamic_elements.h"
 #include "Objects_basic_types.h"
+#include "Objects_events.h"
 
 extern bool reverseKeyBoard;
 
@@ -79,6 +79,32 @@ void changeBackgroundCollor(GtkWidget *window)
 }
 
 extern GtkWidget *windowMain;
+
+static gboolean closeGame(gpointer data)
+{
+    destroyWindow(NULL);
+    return FALSE;
+}
+
+static gboolean hideMessage(gpointer data)
+{
+    gtk_widget_destroy(GTK_WIDGET(data));
+    return FALSE;
+}
+
+void showEndInfoAboutGame(char text[], int time)
+{
+
+    GtkWidget *d = gtk_message_dialog_new(GTK_WINDOW(windowMain), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "%s", text);
+    gtk_widget_show(d);
+
+    if (time > 0)
+        g_timeout_add(time, closeGame, NULL);
+
+    if (time < 0)
+        g_timeout_add(-1*time, hideMessage, d);
+}
+
 void create_battleground()
 {
     gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
@@ -116,13 +142,9 @@ void create_battleground()
 
     create_battleground_static(windowMain, pr_map, lay);
 
-    create_battleground_dynamic(windowMain, pr_map, lay);
+    create_battleground_dynamic(windowMain, pr_map, lay,gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view)),gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view)) );
 
     create_battleground__static_top(windowMain, pr_map, lay);
-
-    CharacterData *characData = (CharacterData *)(mainCharacter->objectData);
-    characData->hadj = gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view));
-    characData->vadj = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view));
 
     //sterowanie postacią
     gtk_widget_add_events(windowMain, GDK_KEY_PRESS_MASK);
@@ -136,13 +158,12 @@ void create_battleground()
         g_signal_connect(G_OBJECT(windowMain), "key_press_event", G_CALLBACK(character_movie_keyboard), mainCharacter);
     }
 
-    set_view_center_By_Character((void *)mainCharacter);
-
     if (isServer)
     {
-        g_timeout_add(1000 / 60, monster_move, NULL);
+        g_timeout_add(1000 / 30, monster_move, NULL);
     }
 
     gtk_widget_show_all(windowMain);
-    g_timeout_add(1000 / 60, readSynchronizationEvent, NULL);
+    g_timeout_add(1000 / 30, readSynchronizationEvent, NULL);
+    g_timeout_add(1000 / 30, set_view_center_object, NULL);
 }

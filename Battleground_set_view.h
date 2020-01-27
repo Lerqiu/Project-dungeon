@@ -6,4 +6,6 @@
 
 void create_battleground();
 
+void showEndInfoAboutGame(char text[],int time);
+
 #endif

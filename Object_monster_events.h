@@ -9,4 +9,6 @@ gboolean monster_move(gpointer data);
 void monsterChangeBodyView(BattlegroundDynamic_element *monster);
 void Synchronization_move_monster(Pointer_and_Index *poi, char event[]);
 
+void deactive_Monsters(void);
+
 #endif

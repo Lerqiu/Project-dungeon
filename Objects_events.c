@@ -15,13 +15,18 @@
 #include "Default_settings.h"
 
 
-extern BattlegroundStatic *static_objects_on_map;
+
 extern int DEF_IMAGE_SIZE;
 extern int defaultCharTabLength;
+extern int windowHeight;
+extern int windowWidth;
 
-bool isAPath(int X, int Y)
+extern BattlegroundStatic *static_objects_on_map;
+extern BattlegroundDynamic_element *showCharacterPointer;
+
+bool isA_object(char type[],int X, int Y)
 {
-    if (!strcmp("path", static_objects_on_map->map[(Y / DEF_IMAGE_SIZE) * static_objects_on_map->X + X / DEF_IMAGE_SIZE]->type))
+    if (!strcmp(type, static_objects_on_map->map[(Y / DEF_IMAGE_SIZE) * static_objects_on_map->X + X / DEF_IMAGE_SIZE]->type))
         return true;
 
     return false;
@@ -103,7 +108,20 @@ bool isCharacterInRangeOfAction(BattlegroundDynamic_element *character, Battlegr
     return false;
 }
 
+gboolean set_view_center_object(gpointer dataPointer)
+{
+    BattlegroundDynamic_element *object = showCharacterPointer;
+    if ((object->objectData) == NULL)
+        return TRUE;
 
+    CharacterData *data = (CharacterData *)(object->objectData);
+    gdouble newX = object->posX - windowWidth / 2;
+    gdouble newY = object->posY - windowHeight / 2;
+    gtk_adjustment_set_value(data->hadj, newX);
+    gtk_adjustment_set_value(data->vadj, newY);
+
+    return TRUE;
+}
 
 
 

@@ -10,6 +10,8 @@
 #include "Objects_basic_types.h"
 #include "Default_settings.h"
 
+extern int defaultCharTabLength;
+
 void characterGetKey(BattlegroundDynamic_element *object)
 {
     if (object == NULL)
@@ -32,7 +34,7 @@ void characterGetKey(BattlegroundDynamic_element *object)
                 ch->keyTab[k->key_type]++;
 
                 extern GtkWidget *labelsTabRightPanel[4];
-                char buffer[100];
+                char buffer[defaultCharTabLength];
                 sprintf(buffer, "%i", ch->keyTab[k->key_type]);
                 gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[k->key_type]), buffer);
 
@@ -72,7 +74,7 @@ void characterKeyUse(BattlegroundDynamic_element *object, int key)
             {
                 ch->keyTab[key]--;
                 extern GtkWidget *labelsTabRightPanel[4];
-                char buffer[100];
+                char buffer[defaultCharTabLength];
                 sprintf(buffer, "%i", ch->keyTab[key]);
                 gtk_label_set_text(GTK_LABEL(labelsTabRightPanel[key]), buffer);
 

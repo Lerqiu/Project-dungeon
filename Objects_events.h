@@ -5,14 +5,12 @@
 #include "Objects_basic_types.h"
 
 
-
-
-Pointer_and_Index *getObject_by_ids(int indexY, int intexX);
-
 bool isCharacterOnPath(BattlegroundDynamic_element *object, int X, int Y);
 bool isColisionDynamic(BattlegroundDynamic_element *character_or_monster, BattlegroundDynamic_element *obj);
 bool isCharacterInRangeOfAction(BattlegroundDynamic_element *character, BattlegroundDynamic_element *obj);
 bool isHumanoidOnPath(BattlegroundDynamic_element *object, int X, int Y);
-bool isAPath(int X, int Y);
+bool isA_object(char type[],int X, int Y);
+
+gboolean set_view_center_object(gpointer dataPointer);
 
 #endif

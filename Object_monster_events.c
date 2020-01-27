@@ -19,6 +19,13 @@ extern int DEF_IMAGE_SIZE;
 extern int defaultCharTabLength;
 extern int defaultMonsterAttackRangeSquares;
 
+bool isMonsterActive = true;
+
+void deactive_Monsters(void)
+{
+    isMonsterActive = false;
+}
+
 void Synchronization_move_monster(Pointer_and_Index *poi, char event[])
 {
     if (strcmp("monster", poi->pointer->type))
@@ -68,7 +75,7 @@ bool checkIfAttacked(BattlegroundDynamic_element *monster, BattlegroundDynamic_e
         if (direction == 1)
             for (int in = 0; in < defaultMonsterAttackRangeSquares; in++)
             {
-                if (isAPath(posXMonster + in * DEF_IMAGE_SIZE, posYMonster) && !isThereAGate(posYMonster / DEF_IMAGE_SIZE, (posXMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE))
+                if (isA_object("path", posXMonster + in * DEF_IMAGE_SIZE, posYMonster) && !isThereAGate(posYMonster / DEF_IMAGE_SIZE, (posXMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE))
                 {
                     if (posXCharacter == (posXMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE && posYCharacter == posYMonster / DEF_IMAGE_SIZE)
                     {
@@ -83,7 +90,7 @@ bool checkIfAttacked(BattlegroundDynamic_element *monster, BattlegroundDynamic_e
         if (direction == 3)
             for (int in = 0; in < defaultMonsterAttackRangeSquares; in++)
             {
-                if (isAPath(posXMonster - in * DEF_IMAGE_SIZE, posYMonster) && !isThereAGate(posYMonster / DEF_IMAGE_SIZE, (posXMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE))
+                if (isA_object("path", posXMonster - in * DEF_IMAGE_SIZE, posYMonster) && !isThereAGate(posYMonster / DEF_IMAGE_SIZE, (posXMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE))
                 {
                     if (posXCharacter == (posXMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE && posYCharacter == posYMonster / DEF_IMAGE_SIZE)
                     {
@@ -102,7 +109,7 @@ bool checkIfAttacked(BattlegroundDynamic_element *monster, BattlegroundDynamic_e
         if (direction == 2)
             for (int in = 0; in < defaultMonsterAttackRangeSquares; in++)
             {
-                if (isAPath(posXMonster, posYMonster + in * DEF_IMAGE_SIZE) && !isThereAGate((posYMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE, posXMonster / DEF_IMAGE_SIZE))
+                if (isA_object("path", posXMonster, posYMonster + in * DEF_IMAGE_SIZE) && !isThereAGate((posYMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE, posXMonster / DEF_IMAGE_SIZE))
                 {
                     if (posXCharacter == posXMonster / DEF_IMAGE_SIZE && posYCharacter == (posYMonster + in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE)
                     {
@@ -117,7 +124,7 @@ bool checkIfAttacked(BattlegroundDynamic_element *monster, BattlegroundDynamic_e
         if (direction == 0)
             for (int in = 0; in < defaultMonsterAttackRangeSquares; in++)
             {
-                if (isAPath(posXMonster, posYMonster - in * DEF_IMAGE_SIZE) && !isThereAGate((posYMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE, posXMonster / DEF_IMAGE_SIZE))
+                if (isA_object("path", posXMonster, posYMonster - in * DEF_IMAGE_SIZE) && !isThereAGate((posYMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE, posXMonster / DEF_IMAGE_SIZE))
                 {
                     if (posXCharacter == posXMonster / DEF_IMAGE_SIZE && posYCharacter == (posYMonster - in * DEF_IMAGE_SIZE) / DEF_IMAGE_SIZE)
                     {
@@ -146,13 +153,16 @@ void monsterChangeBodyView(BattlegroundDynamic_element *monster)
 
     GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
 
-    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(monster->viewData)), pixbuf, 0, 0, 64, 64, -64, -64 * direction, 1.0, 1.0, GDK_INTERP_NEAREST);
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(monster->viewData)), pixbuf, 0, 0, 64, 64, -64 * mData->indexOfFrame, -64 * direction, 1.0, 1.0, GDK_INTERP_NEAREST);
     //g_object_unref(gtk_image_get_pixbuf(GTK_IMAGE(monster->image)));
     gtk_image_clear(GTK_IMAGE(monster->image));
 
     gtk_image_set_from_pixbuf(GTK_IMAGE(monster->image), pixbuf);
 
     g_object_unref(pixbuf);
+    mData->indexOfFrame++;
+    if (mData->indexOfFrame > 8)
+        mData->indexOfFrame = 0;
 }
 
 void monstersMakeAttac(void)
@@ -210,6 +220,8 @@ void monster_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int
 
 gboolean monster_move(gpointer data)
 {
+    if (!isMonsterActive)
+        return FALSE;
 
     BattlegroundDynamic *monsters = getObjectByType("monster");
 
