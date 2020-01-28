@@ -1,4 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "Objects_basic_types.h"
+#include <string.h>
 
 BattlegroundStatic *static_objects_on_map = NULL;
 BattlegroundDynamic *dynamic_objects_on_map = NULL;

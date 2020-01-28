@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <string.h>
 
 #include "Objects_events.h"
 #include "Objects_basic_types.h"
