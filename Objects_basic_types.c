@@ -79,6 +79,8 @@ void delete_BattlegroundDynamic_element(int indexY, int indexX)
                 gtk_container_remove(GTK_CONTAINER(dynamic_objects_on_map->tabOfElements[i]->layout), dynamic_objects_on_map->tabOfElements[i]->image);
                 dynamic_objects_on_map->tabOfElements[i]->image = NULL;
 
+                free(dynamic_objects_on_map->tabOfElements[i]->objectData);
+                dynamic_objects_on_map->tabOfElements[i]->objectData = NULL;
                 free(dynamic_objects_on_map->tabOfElements[i]);
                 dynamic_objects_on_map->tabOfElements[i] = NULL;
                 return;

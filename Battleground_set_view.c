@@ -102,13 +102,14 @@ void showEndInfoAboutGame(char text[], int time)
         g_timeout_add(time, closeGame, NULL);
 
     if (time < 0)
-        g_timeout_add(-1*time, hideMessage, d);
+        g_timeout_add(-1 * time, hideMessage, d);
 }
 
 void create_battleground()
 {
-    gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
+    //gtk_window_set_default_size(GTK_WINDOW(windowMain), windowWidth, windowHeight);
     //gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
+    gtk_widget_set_size_request(GTK_WIDGET(windowMain), windowWidth, windowHeight);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
     changeBackgroundCollor(windowMain);
 
@@ -142,7 +143,7 @@ void create_battleground()
 
     create_battleground_static(windowMain, pr_map, lay);
 
-    create_battleground_dynamic(windowMain, pr_map, lay,gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view)),gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view)) );
+    create_battleground_dynamic(windowMain, pr_map, lay, gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(view)), gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(view)));
 
     create_battleground__static_top(windowMain, pr_map, lay);
 
@@ -165,5 +166,5 @@ void create_battleground()
 
     gtk_widget_show_all(windowMain);
     g_timeout_add(1000 / 30, readSynchronizationEvent, NULL);
-    g_timeout_add(1000 / 30, set_view_center_object, NULL);
+    g_timeout_add(1000 / 60, set_view_center_object, NULL);
 }

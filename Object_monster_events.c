@@ -28,6 +28,9 @@ void deactive_Monsters(void)
 
 void Synchronization_move_monster(Pointer_and_Index *poi, char event[])
 {
+    if (poi == NULL)
+        return;
+        
     if (strcmp("monster", poi->pointer->type))
         return;
 
@@ -198,15 +201,12 @@ void monster_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int
 
     if (isHumanoidOnPath(object, x, y) == true && humanoidColisionGate(object, x, y) == false)
     {
-        object->posX = object->posX + oX;
-        object->posY = object->posY + oY;
-
         MonsterData *mData = (MonsterData *)object->objectData;
 
         if (object->image != NULL)
         {
             char action[defaultCharTabLength];
-            sprintf(action, "move-%i-%i-imageView-%i-%i", object->posY, object->posX, mData->direction, mData->indexOfFrame);
+            sprintf(action, "move-%i-%i-imageView-%i-%i", object->posY+oY, object->posX+oX, mData->direction, mData->indexOfFrame);
             newSmallSynchronizationEvent(object, action);
             gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
         }

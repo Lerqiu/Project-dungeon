@@ -11,16 +11,17 @@
 
 bool humanoidColisionGate(BattlegroundDynamic_element *object, int oX, int oY)
 {
+    BattlegroundDynamic *gates = getObjectByType("gate");
+
+    if (gates->amount < 1)
+        return false;
+
+        
     int x, y;
     x = object->posX;
     y = object->posY;
     object->posX = oX - object->pivotPosX;
     object->posY = oY - object->pivotPosY;
-
-    BattlegroundDynamic *gates = getObjectByType("gate");
-
-    if (gates->amount < 1)
-        return false;
 
     for (int i = 0; i < gates->amount; i++)
     {

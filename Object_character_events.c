@@ -17,17 +17,21 @@
 #include "Battleground_set_view.h"
 
 extern int defaultCharTabLength;
+extern char folderPathDynamic[];
 
 extern BattlegroundDynamic *dynamic_objects_on_map;
 extern BattlegroundDynamic_element *mainCharacter;
 extern BattlegroundDynamic_element *showCharacterPointer;
 
 static void characterChangeBodyView(BattlegroundDynamic_element *character);
+static gboolean play_explosion(gpointer data);
 
 //Synchronizacja danych
 
 void Synchronization_move_character(Pointer_and_Index *poi, char event[])
 {
+    if (poi == NULL)
+        return;
     if (strcmp("character", poi->pointer->type))
         return;
 
@@ -54,14 +58,28 @@ void Synchronization_move_character(Pointer_and_Index *poi, char event[])
 
 void Synchronization_character_dead(BattlegroundDynamic_element *character)
 {
+    if (character == NULL)
+        return;
+
     characterClearKeys(character);
     free(character->type);
     character->type = (char *)malloc(sizeof(char) * defaultCharTabLength);
     strcpy(character->type, "dead_character");
 
     gtk_image_clear(GTK_IMAGE(character->image));
-    gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
-    character->image = NULL;
+    gtk_image_clear(GTK_IMAGE(character->viewData));
+
+    char pathToFile[defaultCharTabLength];
+    sprintf(pathToFile, "%s%s%s", folderPathDynamic, "explosion", ".png");
+    gtk_image_set_from_file(GTK_IMAGE(character->viewData), pathToFile);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(character->viewData)), pixbuf, 0, 0, 64, 64, 0, 0, 1.0, 1.0, GDK_INTERP_NEAREST);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(character->image), pixbuf);
+    CharacterData *chData = (CharacterData *)character->objectData;
+    chData->indexOfFrame = 0;
+    g_timeout_add(1000 / 30, play_explosion, character);
+
+    g_object_unref(pixbuf);
 
     if (character->indexStartPointX == mainCharacter->indexStartPointX &&
         character->indexStartPointY == mainCharacter->indexStartPointY)
@@ -97,6 +115,9 @@ void character_clear_type(void)
 
 void Synchronization_character_win(BattlegroundDynamic_element *character)
 {
+    if (character == NULL)
+        return;
+
     if (character->indexStartPointX == mainCharacter->indexStartPointX &&
         character->indexStartPointY == mainCharacter->indexStartPointY)
     {
@@ -145,6 +166,32 @@ static void characterChangeBodyView(BattlegroundDynamic_element *character)
     chData->previousPosY = character->posY;
 }
 
+static gboolean play_explosion(gpointer data)
+{
+    BattlegroundDynamic_element *character = (BattlegroundDynamic_element *)data;
+    CharacterData *chData = (CharacterData *)character->objectData;
+    chData->indexOfFrame++;
+    if (chData->indexOfFrame > 15)
+    {
+        gtk_image_clear(GTK_IMAGE(character->image));
+        gtk_image_clear(GTK_IMAGE(character->viewData));
+        gtk_container_remove(GTK_CONTAINER(character->layout), character->image);
+
+        return FALSE;
+    }
+
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(character->viewData)), pixbuf, 0, 0, 64, 64, -64 * chData->indexOfFrame, 0, 1.0, 1.0, GDK_INTERP_NEAREST);
+    gtk_image_clear(GTK_IMAGE(character->image));
+
+    gtk_image_set_from_pixbuf(GTK_IMAGE(character->image), pixbuf);
+
+    g_object_unref(pixbuf);
+
+    return TRUE;
+}
+
 //Pozostałe
 
 void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int oY)
@@ -158,14 +205,16 @@ void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, i
     int x = object->posX + oX + object->pivotPosX;
     int y = object->posY + oY + object->pivotPosY;
 
+    extern int defaultMonsterSpeed;
+    extern int defaultCharacterSpeed;
+
     if (isHumanoidOnPath(object, x, y) == true && humanoidColisionGate(object, x, y) == false)
     {
-        object->posX = object->posX + oX;
-        object->posY = object->posY + oY;
+
         if (object->image != NULL)
         {
             char action[defaultCharTabLength];
-            sprintf(action, "move-%i-%i", object->posY, object->posX);
+            sprintf(action, "move-%i-%i", object->posY + oY, object->posX + oX);
             newSmallSynchronizationEvent(object, action);
             characterChangeBodyView(object);
         }
