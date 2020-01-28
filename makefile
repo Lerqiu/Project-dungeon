@@ -1,4 +1,4 @@
-.PHONY: START clean
+.PHONY: clean
 
 CC=gcc
 NAME=ProjectDungeon
