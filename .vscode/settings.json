@@ -10,6 +10,7 @@
         "stdbool.h": "c",
         "map_loader_dynamic_elements.h": "c",
         "map_loader_statics_elements.h": "c",
-        "objects_basic_types.h": "c"
+        "objects_basic_types.h": "c",
+        "objects_events_synchronization.h": "c"
     }
 }
