@@ -19,5 +19,6 @@ gboolean createStartWindowShowHideMaps(GtkWidget *widget, GParamSpec *pspec, gpo
 GSList *createStartWindowShowMap(GtkWidget *parentContainer);
 
 void destroyWindow(gpointer data);
+gboolean enter_escape_key_events(GtkWidget *widget, GdkEventKey *event, gpointer data);
 
 #endif

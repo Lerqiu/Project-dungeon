@@ -22,6 +22,8 @@ extern BattlegroundDynamic *dynamic_objects_on_map;
 extern BattlegroundDynamic_element *mainCharacter;
 extern BattlegroundDynamic_element *showCharacterPointer;
 
+static void characterChangeBodyView(BattlegroundDynamic_element *character);
+
 //Synchronizacja danych
 
 void Synchronization_move_character(Pointer_and_Index *poi, char event[])
@@ -45,6 +47,8 @@ void Synchronization_move_character(Pointer_and_Index *poi, char event[])
     {
         gtk_fixed_move(GTK_FIXED(object->layout), object->image, X, Y);
     }
+    characterChangeBodyView(object);
+
     free(poi);
 }
 
@@ -107,6 +111,40 @@ void Synchronization_character_win(BattlegroundDynamic_element *character)
     deactive_Monsters();
 }
 
+//Zmiana wyglądu
+
+static void characterChangeBodyView(BattlegroundDynamic_element *character)
+{
+    CharacterData *chData = (CharacterData *)character->objectData;
+
+    int direction = chData->directionForImages;
+    if (character->posX - chData->previousPosX > 0)
+        direction = 3;
+    if (character->posX - chData->previousPosX < 0)
+        direction = 1;
+    if (character->posY - chData->previousPosY > 0)
+        direction = 2;
+    if (character->posY - chData->previousPosY < 0)
+        direction = 0;
+
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(character->viewData)), pixbuf, 0, 0, 64, 64, -64 * chData->indexOfFrame, -64 * direction, 1.0, 1.0, GDK_INTERP_NEAREST);
+    gtk_image_clear(GTK_IMAGE(character->image));
+
+    gtk_image_set_from_pixbuf(GTK_IMAGE(character->image), pixbuf);
+
+    g_object_unref(pixbuf);
+    chData->indexOfFrame++;
+    if (chData->indexOfFrame > 8)
+        chData->indexOfFrame = 0;
+
+    chData->directionForImages = direction;
+
+    chData->previousPosX = character->posX;
+    chData->previousPosY = character->posY;
+}
+
 //Pozostałe
 
 void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, int oY)
@@ -129,7 +167,7 @@ void character_move_set_on_layout(BattlegroundDynamic_element *object, int oX, i
             char action[defaultCharTabLength];
             sprintf(action, "move-%i-%i", object->posY, object->posX);
             newSmallSynchronizationEvent(object, action);
-            gtk_fixed_move(GTK_FIXED(object->layout), object->image, object->posX, object->posY);
+            characterChangeBodyView(object);
         }
     }
     characterGetKey(object);

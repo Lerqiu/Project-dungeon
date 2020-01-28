@@ -10,11 +10,13 @@
 #include "Set_connections_betwen_players.h"
 #include "Default_settings.h"
 #include "Windows_FIFO.h"
+#include "Objects_basic_types.h"
 
 extern char gameName[];
 extern int maxLengthOfPath;
 extern char folderPathMaps[];
 extern char folderPathOthers[];
+extern BattlegroundDynamic *dynamic_objects_on_map;
 
 GSList *createStartWindowShowMap(GtkWidget *parentContainer)
 {
@@ -144,9 +146,28 @@ void destroyStartWindowContainers(void)
 
 void destroyWindow(gpointer data)
 {
-    if (isConnectedPipe()){
+    if (isConnectedPipe())
+    {
         sendStringToPipe("Synchronization GtkWindow 0 0 destroy\n");
     }
-        
+
     gtk_main_quit();
+}
+
+gboolean enter_escape_key_events(GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+
+    if (event->keyval == GDK_KEY_Escape)
+    {
+        gtk_widget_destroy(windowMain);
+        return TRUE;
+    }
+    else if (event->keyval == GDK_KEY_Return)
+    {
+        if (dynamic_objects_on_map == NULL)
+            checkCorrectData(NULL, data);
+        return TRUE;
+    }
+
+    return FALSE;
 }

@@ -81,6 +81,10 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         CharacterData *data = (CharacterData *)malloc(sizeof(CharacterData));
         data->hadj = NULL;
         data->vadj = NULL;
+        data->indexOfFrame = 0;
+        data->previousPosX = element->posX;
+        data->previousPosY = element->posY;
+        data->directionForImages=0;
         for (int i = 0; i < 4; i++)
             data->keyTab[i] = 0;
         element->objectData = (void *)data;
@@ -123,7 +127,7 @@ BattlegroundDynamic_element *load_battleground_dynamic(Prototype_map_element *pr
         m->endIndexX = element->indexStartPointX;
         m->endIndexY = element->indexStartPointY;
         m->isColision = false;
-        m->indexOfFrame=0;
+        m->indexOfFrame = 0;
         if (m->amountsOfSteps > 0)
         {
             if (m->direction == 0)

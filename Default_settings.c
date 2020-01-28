@@ -33,13 +33,13 @@ int MainCharacterServerSearchMapIndex= 0;   //Na mapę składa się 2 graczy, pr
 
 //Ustawienia postaci servera
 char *characterNameServer = NULL;
-char  *characterImagePathServer = "./Images/Dynamic/character_server.png";
+char  *characterImagePathServer = "./Images/Dynamic/character_Server.png";
 int characterServerIndexX;
 int characterServerIndexY;
 
 //Ustawienia postaci hosta
 char *characterNameHost = NULL;
-char *characterImagePathHost = "./Images/Dynamic/character_host.png";
+char *characterImagePathHost = "./Images/Dynamic/character_Host.png";
 int characterHostIndexX;
 int characterHostIndexY;
 

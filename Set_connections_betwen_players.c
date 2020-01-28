@@ -34,6 +34,7 @@ static gboolean wait_for_start_signal_end(void)
 {
     if (dialPointer != NULL)
         gtk_widget_destroy(dialPointer);
+
     isChecking = false;
     amount_of_checks = timeForConnectionCheck;
     dialPointer = NULL;

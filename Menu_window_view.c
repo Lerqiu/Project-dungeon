@@ -23,6 +23,8 @@ void createStartWindowMenu(void)
     CheckCorrectData_Struct *Data = (CheckCorrectData_Struct *)malloc(sizeof(CheckCorrectData_Struct));
 
     windowMain = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_add_events(windowMain, GDK_KEY_PRESS_MASK);
+
     Data->window = windowMain;
     gtk_window_set_title(GTK_WINDOW(windowMain), gameName);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
@@ -46,7 +48,7 @@ void createStartWindowMenu(void)
     gtk_container_add(GTK_CONTAINER(boxLNick), entryNick);
 
     //Server/Host
-    GtkWidget *boxLSer_Hos = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *boxLSer_Hos = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(boxLMain), boxLSer_Hos);
 
     GtkWidget *labelSer_Hos = gtk_label_new("Uruchomić jako server: ");
@@ -73,10 +75,10 @@ void createStartWindowMenu(void)
     gtk_container_add(GTK_CONTAINER(boxLKey), switchKey);
     gtk_switch_set_active(GTK_SWITCH(switchKey), FALSE);
 
-    GtkWidget *image1Key = gtk_image_new_from_file(FullName_Path_get(folderPathOthers, "key_r2.png"));
+    GtkWidget *image1Key = gtk_image_new_from_file(FullName_Path_get(folderPathOthers, "key_s2.png"));
     gtk_container_add(GTK_CONTAINER(boxLMain), image1Key);
 
-    GtkWidget *image2Key = gtk_image_new_from_file(FullName_Path_get(folderPathOthers, "key_s2.png"));
+    GtkWidget *image2Key = gtk_image_new_from_file(FullName_Path_get(folderPathOthers, "key_r2.png"));
     gtk_container_add(GTK_CONTAINER(boxLMain), image2Key);
 
     //Mapa
@@ -94,6 +96,8 @@ void createStartWindowMenu(void)
     gtk_widget_set_hexpand(buttonPlay, TRUE);
     gtk_widget_set_halign(buttonPlay, GTK_ALIGN_END);
     gtk_container_add(GTK_CONTAINER(boxLPlay), buttonPlay);
+
+     g_signal_connect(G_OBJECT(windowMain), "key_press_event", G_CALLBACK(enter_escape_key_events), Data);
 
     g_signal_connect(G_OBJECT(windowMain), "destroy", G_CALLBACK(destroyWindow), NULL);
     gtk_window_set_default_size(GTK_WINDOW(windowMain), 400, 240 * 2);

@@ -44,6 +44,12 @@ typedef struct character_data
     GtkAdjustment *vadj;
     int keyTab[4];//typy kluczy
 
+    int previousPosX;
+    int previousPosY;
+    int indexOfFrame;
+
+    int directionForImages;
+
 } CharacterData;
 
 typedef struct gate_data

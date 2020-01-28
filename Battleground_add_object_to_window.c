@@ -86,8 +86,8 @@ void create_character(BattlegroundDynamic *map, GtkAdjustment *hadjCharacter, Gt
 
     extern int MainCharacterServerSearchMapIndex;
 
-    character[MainCharacterServerSearchMapIndex]->image = gtk_image_new_from_file(characterImagePathServer);
-    character[1 - MainCharacterServerSearchMapIndex]->image = gtk_image_new_from_file(characterImagePathHost);
+    character[MainCharacterServerSearchMapIndex]->viewData = gtk_image_new_from_file(characterImagePathServer);
+    character[1 - MainCharacterServerSearchMapIndex]->viewData = gtk_image_new_from_file(characterImagePathHost);
 
     if (isServer)
     {
@@ -108,6 +108,16 @@ void create_character(BattlegroundDynamic *map, GtkAdjustment *hadjCharacter, Gt
         characterHostIndexY = character[MainCharacterServerSearchMapIndex]->indexStartPointY;
     }
     showCharacterPointer = mainCharacter;
+
+    GdkPixbuf *pixbuf1 = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(character[0]->viewData)), pixbuf1, 0, 0, 64, 64, 0, 0, 1.0, 1.0, GDK_INTERP_NEAREST);
+    character[0]->image = gtk_image_new_from_pixbuf(pixbuf1);
+    g_object_unref(pixbuf1);
+
+    GdkPixbuf *pixbuf2 = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, 64, 64);
+    gdk_pixbuf_scale(gtk_image_get_pixbuf(GTK_IMAGE(character[1]->viewData)), pixbuf2, 0, 0, 64, 64, 0, 0, 1.0, 1.0, GDK_INTERP_NEAREST);
+    character[1]->image = gtk_image_new_from_pixbuf(pixbuf2);
+    g_object_unref(pixbuf2);
 }
 
 void battleground_draw_battleground_dynamic(BattlegroundDynamic *elements)
