@@ -25,6 +25,8 @@ void createStartWindowMenu(void)
     windowMain = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_add_events(windowMain, GDK_KEY_PRESS_MASK);
 
+    changeBackgroundCollor(windowMain,"#33393b");
+
     Data->window = windowMain;
     gtk_window_set_title(GTK_WINDOW(windowMain), gameName);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);

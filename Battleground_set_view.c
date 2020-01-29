@@ -58,26 +58,6 @@ void createRightPanel(GtkWidget *MainBox)
     }
 }
 
-void changeBackgroundCollor(GtkWidget *window)
-{
-    GtkCssProvider *cssP = gtk_css_provider_new();
-    GdkDisplay *dis = gdk_display_get_default();
-    GdkScreen *scr = gdk_display_get_default_screen(dis);
-
-    gtk_style_context_add_provider_for_screen(scr, GTK_STYLE_PROVIDER(cssP), GTK_STYLE_PROVIDER_PRIORITY_USER);
-    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssP),
-                                    "GtkWindow {  \n"
-                                    "   background-color: #201d20;    \n"
-                                    //"   background-color: red;    \n"
-                                    "} \n"
-                                    "window {  \n"
-                                    "   background-color: #201d20;    \n"
-                                    //"   background-color: red;    \n"
-                                    "} \n",
-                                    -1, NULL);
-    g_object_unref(cssP);
-}
-
 extern GtkWidget *windowMain;
 
 static gboolean closeGame(gpointer data)
@@ -111,7 +91,7 @@ void create_battleground()
     //gtk_window_set_resizable(GTK_WINDOW(windowMain), FALSE);
     gtk_widget_set_size_request(GTK_WIDGET(windowMain), windowWidth, windowHeight);
     gtk_window_set_position(GTK_WINDOW(windowMain), GTK_WIN_POS_CENTER);
-    changeBackgroundCollor(windowMain);
+    changeBackgroundCollor(windowMain,"#201d20");
 
     char *name;
     if (isServer == true)

@@ -16,6 +16,7 @@ extern char gameName[];
 extern int maxLengthOfPath;
 extern char folderPathMaps[];
 extern char folderPathOthers[];
+extern int defaultCharTabLength;
 extern BattlegroundDynamic *dynamic_objects_on_map;
 
 GSList *createStartWindowShowMap(GtkWidget *parentContainer)
@@ -170,4 +171,18 @@ gboolean enter_escape_key_events(GtkWidget *widget, GdkEventKey *event, gpointer
     }
 
     return FALSE;
+}
+
+void changeBackgroundCollor(GtkWidget *window,char color[])
+{
+    GtkCssProvider *cssP = gtk_css_provider_new();
+    GdkDisplay *dis = gdk_display_get_default();
+    GdkScreen *scr = gdk_display_get_default_screen(dis);
+
+    char buffer[defaultCharTabLength*3];
+    sprintf(buffer,"GtkWindow {  \n background-color: %s;    \n} \n window {  \n   background-color: %s;    \n} \n",color,color);
+
+    gtk_style_context_add_provider_for_screen(scr, GTK_STYLE_PROVIDER(cssP), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssP),buffer,-1, NULL);
+    g_object_unref(cssP);
 }
