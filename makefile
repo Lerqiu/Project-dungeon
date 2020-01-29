@@ -26,10 +26,10 @@ FILES+=Windows_FIFO.o
 
 
 $(NAME): ${FILES}
-		$(CC) ${FILES} `pkg-config --libs gtk+-3.0` -lm -g -o $@ -fsanitize=address
+		$(CC) ${FILES} `pkg-config --libs gtk+-3.0` -lm -g -o $@ 
 
 %.o: %.c *.h
-		$(CC) $< -c `pkg-config --cflags gtk+-3.0` -lm -g -o $@ -fsanitize=address
+		$(CC) $< -c `pkg-config --cflags gtk+-3.0` -lm -g -o $@ 
 
 clean:
 		rm *.o AtoB BtoA $(NAME)
